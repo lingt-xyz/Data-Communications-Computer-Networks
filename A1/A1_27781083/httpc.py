@@ -111,8 +111,8 @@ def seturl(c):
 
 def setdata(c):
     global data
-    data_pos = c.find("-d") + 3
-    url_pos = c.find("http") - 1
+    data_pos = c.find("-d") + 4
+    url_pos = c.find("http") - 2
     data = c[data_pos:url_pos]
 
 
@@ -128,7 +128,7 @@ def setfile(c):
 
 def findrfname(c):
     global rfname
-    rfname_pos = c.find("-o") + 2
+    rfname_pos = c.find("-o") + 3
     rfname = c[rfname_pos:]
 
 

@@ -2,6 +2,7 @@ import socket
 from urllib.parse import urlparse
 import argparse
 
+
 def get(url, verbose=False):
     o = urlparse(url)
 
@@ -22,7 +23,7 @@ def get(url, verbose=False):
 def post(url, paras, format):
     o = urlparse(url)
 
-    headers = ( "POST /{path} HTTP/1.0\r\n"
+    headers = ( "POST {path} HTTP/1.0\r\n"
                 "{content_type}\r\n"
                 "Content-Length: {content_length}\r\n"
                 "Host: {host}\r\n"
@@ -34,7 +35,7 @@ def post(url, paras, format):
         path=o.path,
         content_type=format,
         content_length=len(paras),
-        host = o.netloc
+        host=o.netloc
     ).encode('utf-8')
 
     request = header_bytes + body_bytes
@@ -44,6 +45,7 @@ def post(url, paras, format):
         s.sendall(request)
         data = recvall(s)
     print(data.decode('utf-8'))
+
 
 def recvall(sock):
     BUFF_SIZE = 1024 # 1 KiB
@@ -62,11 +64,11 @@ URL2 = 'http://httpbin.org/post'
 
 ex1 = "http://httpbin.org/get?course=networking&assignment=1"
 
-#get(URL1)
+# get(URL1)
 
-#post(URL2)
+# post(URL2)
 
-#get(ex1, True)
+# get(ex1, True)
 
 # Usage: python httpc.py (get|post) [-v] (-h "k:v")* [-d inline-data] [-f file] URL
 
@@ -83,7 +85,7 @@ parser.add_argument("url")
 parser.add_argument("paras", nargs='?')
 parser.add_argument("format", nargs='?')
 args = parser.parse_args()
-#print(args)
+# print(args)
 
 if args.method == 'get':
     get(args.url, args.v)
