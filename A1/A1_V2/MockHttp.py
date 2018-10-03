@@ -42,12 +42,44 @@ Via: 1.1 vegur
   "url": "http://httpbin.org/get?course=networking&assignment=1"
 }
 """
+
+class HttpRequest:
+
+  def __init__(self, host, path, query, content_type):
+    self.path = path
+    self.host = host
+    self.query = query
+    self.content_type = content_type
+
+  def getGet(self):
+    return  ( "GET "+ self.path + "?" + self.query + " HTTP/1.0\r\n"
+              "Host:" + self.host + "\r\n\r\n").encode('utf-8')
+
+  def getPost(self):
+    headers = ( "POST {path} HTTP/1.0\r\n"
+                "{content_type}\r\n"
+                "Content-Length: {content_length}\r\n"
+                "Host: {host}\r\n"
+                "User-Agent: Concordia-HTTP/1.0\r\n"
+                "Connection: close\r\n\r\n")
+
+    body_bytes = self.query.encode('utf-8')                              
+    header_bytes = headers.format(
+        path=self.path,
+        content_type=self.content_type,
+        content_length=len(self.query),
+        host=self.host
+    ).encode('utf-8')
+    return header_bytes + body_bytes
+
+
 class HttpResponse:
-  def __init__(response):
+
+  def __init__(self, response):
     self.text = response.decode('utf-8')
     self.parseText()
 
-  def parseText():
+  def parseText(self):
     texts = self.text.split("\r\n\r\n")
     self.header = texts[0]
     self.body = texts[1]
@@ -55,4 +87,11 @@ class HttpResponse:
     infos = lines[0].split(" ")
     self.code = infos[1]
     self.status = infos[2]
-    self.location = lines[1]
+    if(self.code == HttpCode.redirect):
+      self.location = lines[1].split(" ")[1].split("//")[1][:-1]
+      print("Redirect to " + self.location)
+
+
+class HttpCode:
+  redirect = "301"
+  ok = "200"

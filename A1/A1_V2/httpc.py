@@ -1,21 +1,24 @@
 import socket
 from urllib.parse import urlparse
 import argparse
-import MockResponse
+import MockHttp
 
 
 def get(url, verbose=False):
     o = urlparse(url)
+    host = o.netloc
+    while(True):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((host, 80))
+            request = MockHttp.HttpRequest(host, o.path, o.query, None)
+            s.sendall(request.getGet())
+            data = recvall(s)
+        response = MockHttp.HttpResponse(data)
 
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((o.netloc, 80))
-        request = ( "GET "+ o.path + "?" + o.query + " HTTP/1.0\r\n"
-                    "Host:" + o.netloc + "\r\n\r\n")
-        #print(request)
-        s.sendall(bytes(request, 'utf-8'))
-        data = recvall(s)
-    response = MockResponse.HttpResponse(data)
-    getCode(data.decode('utf-8'))
+        if(response.code == MockHttp.HttpCode.redirect):
+            host = response.location
+        else:
+            break
     
     if verbose:
         print(data.decode('utf-8'))
@@ -24,32 +27,28 @@ def get(url, verbose=False):
         print (responses[1])
     
 
-def post(url, paras, format):
+def post(url, paras, format, verbose=False):
     o = urlparse(url)
+    host = o.netloc
+    
+    while(True):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((o.netloc, 80))
+            request = MockHttp.HttpRequest(host, o.path, paras, format)
+            s.sendall(request.getPost())
+            data = recvall(s)
+        response = MockHttp.HttpResponse(data)
 
-    headers = ( "POST {path} HTTP/1.0\r\n"
-                "{content_type}\r\n"
-                "Content-Length: {content_length}\r\n"
-                "Host: {host}\r\n"
-                "User-Agent: Concordia-HTTP/1.0\r\n"
-                "Connection: close\r\n\r\n")
+        if(response.code == MockHttp.HttpCode.redirect):
+            host = response.location
+        else:
+            break
 
-    body_bytes = paras.encode('utf-8')                              
-    header_bytes = headers.format(
-        path=o.path,
-        content_type=format,
-        content_length=len(paras),
-        host=o.netloc
-    ).encode('utf-8')
-
-    request = header_bytes + body_bytes
-
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((o.netloc, 80))
-        s.sendall(request)
-        data = recvall(s)
-    print(data.decode('utf-8'))
-
+    if verbose:
+        print(data.decode('utf-8'))
+    else:
+        responses = data.decode('utf-8').split("\r\n\r\n")
+        print (responses[1])
 
 def recvall(sock):
     BUFF_SIZE = 1024 # 1 KiB
@@ -62,13 +61,6 @@ def recvall(sock):
             break
     return data
 
-def getCode(response):
-    lines = response.split("\r\n")
-    print(lines)
-    #print(lines[0].split(" "))
-    code = lines[0].split(" ")[1]
-    location = lines[1]
-    #print(code + ":" + location)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", action='store_true')
@@ -85,4 +77,4 @@ if args.method == 'get':
     get(args.url, args.v)
 
 if args.method == 'post':
-    post(args.url, args.paras, args.format)
+    post(args.url, args.paras, args.format, args.v)
