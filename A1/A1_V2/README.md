@@ -4,7 +4,7 @@
 2. `python3 httpc.py get -v 'http://httpbin.org/get?course=networking&assignment=1'`
 3. `python3 httpc.py -header --d post http://httpbin.org/post '{"Assignment": 1}' Content-Type:application/json`
 4. `python3 httpc.py -header -v --d post http://httpbin.org/post '{"Assignment": 1}' Content-Type:application/json`
-4. `python3 httpc.py get 'http://google.ca/'`
+5. `python3 httpc.py get 'http://google.ca/'`
 
 ### Redirection
 * 301 Moved Permanently
