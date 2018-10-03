@@ -61,6 +61,7 @@ def recvall(sock):
     return data
 
 def getCode(response):
+    print(response)
     lines = response.split("\r\n")
     print(lines)
     print(lines[0].split(" "))
