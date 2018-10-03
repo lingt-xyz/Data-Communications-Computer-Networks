@@ -12,13 +12,15 @@ def get(url, verbose=False):
                     "Host:" + o.netloc + "\r\n\r\n")
         s.sendall(bytes(request, 'utf-8'))
         data = recvall(s)
-
+    
+    getCode(data.decode('utf-8'))
+    
     if verbose:
         print(data.decode('utf-8'))
     else:
         responses = data.decode('utf-8').split("\r\n\r\n")
         print (responses[1])
-    getCode(data.decode('utf-8'))
+    
 
 def post(url, paras, format):
     o = urlparse(url)
