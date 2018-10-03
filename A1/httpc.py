@@ -18,7 +18,7 @@ def get(url, verbose=False):
     else:
         responses = data.decode('utf-8').split("\r\n\r\n")
         print (responses[1])
-    
+    getCode(data.decode('utf-8'))
 
 def post(url, paras, format):
     o = urlparse(url)
@@ -58,6 +58,11 @@ def recvall(sock):
             break
     return data
 
+def getCode(response):
+    lines = response.split("\r\n")
+    code = lines[0].split(" ")[1]
+    location = lines[1]
+    print(code + ":" + location)
 
 URL1 = 'http://httpbin.org/status/418'
 URL2 = 'http://httpbin.org/post'
