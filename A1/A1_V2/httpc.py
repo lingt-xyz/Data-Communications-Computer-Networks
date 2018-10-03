@@ -21,10 +21,9 @@ def get(url, verbose=False):
             break
     
     if verbose:
-        print(data.decode('utf-8'))
+        print(response.text)
     else:
-        responses = data.decode('utf-8').split("\r\n\r\n")
-        print (responses[1])
+        print (response.body)
     
 
 def post(url, paras, format, verbose=False):
@@ -45,10 +44,9 @@ def post(url, paras, format, verbose=False):
             break
 
     if verbose:
-        print(data.decode('utf-8'))
+        print(response.text)
     else:
-        responses = data.decode('utf-8').split("\r\n\r\n")
-        print (responses[1])
+        print (response.body)
 
 def recvall(sock):
     BUFF_SIZE = 1024 # 1 KiB
