@@ -1,6 +1,7 @@
 import socket
 from urllib.parse import urlparse
 import argparse
+import MockResponse
 
 
 def get(url, verbose=False):
@@ -10,9 +11,10 @@ def get(url, verbose=False):
         s.connect((o.netloc, 80))
         request = ( "GET "+ o.path + "?" + o.query + " HTTP/1.0\r\n"
                     "Host:" + o.netloc + "\r\n\r\n")
+        #print(request)
         s.sendall(bytes(request, 'utf-8'))
         data = recvall(s)
-    
+    response = MockResponse.HttpResponse(data)
     getCode(data.decode('utf-8'))
     
     if verbose:
@@ -61,30 +63,12 @@ def recvall(sock):
     return data
 
 def getCode(response):
-    print(response)
     lines = response.split("\r\n")
     print(lines)
-    print(lines[0].split(" "))
+    #print(lines[0].split(" "))
     code = lines[0].split(" ")[1]
     location = lines[1]
-    print(code + ":" + location)
-
-URL1 = 'http://httpbin.org/status/418'
-URL2 = 'http://httpbin.org/post'
-
-ex1 = "http://httpbin.org/get?course=networking&assignment=1"
-
-# get(URL1)
-
-# post(URL2)
-
-# get(ex1, True)
-
-# Usage: python httpc.py (get|post) [-v] (-h "k:v")* [-d inline-data] [-f file] URL
-
-# python3 httpc.py get 'http://httpbin.org/get?course=networking&assignment=1'
-# python3 httpc.py get -v 'http://httpbin.org/get?course=networking&assignment=1'
-# python3 httpc.py -header --d post http://httpbin.org/post '{"Assignment": 1}' Content-Type:application/json
+    #print(code + ":" + location)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", action='store_true')
