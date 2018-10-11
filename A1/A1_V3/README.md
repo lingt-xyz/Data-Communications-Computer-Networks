@@ -9,8 +9,9 @@
     5. `get -v 'http://httpbin.org/get?course=networking&assignment=1' -o hello.txt`
     6. `get 'http://google.ca/'`
     7. `get -v 'http://google.ca/'`
+    8. `post -h Content-Type:application/json --f "test.txt" http://httpbin.org/post`
 
 
 ### Team: 
-* 27781083: 
+* 27781083: Tiantian Ji
 * 40014082: Ling Tan
