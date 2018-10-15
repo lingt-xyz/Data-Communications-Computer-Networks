@@ -10,6 +10,7 @@
     6. `get 'http://google.ca/'`
     7. `get -v 'http://google.ca/'`
     8. `post -h Content-Type:application/json -f test.txt http://httpbin.org/post`
+    9. `post -h Content-Type: file/txt -f test.txt http://httpbin.org/post -o filewrite.txt`
 
 
 ### Team: 
