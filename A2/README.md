@@ -28,3 +28,14 @@ usage: `httpfs [-v] [-p PORT] [-d PATH-TO-DIR]`
 * `-v` Prints debugging messages.
 * `-p` Specifies the port number that the server will listen and serve at Default is 8080.
 * `-d` Specifies the directory that the server will use to read/write requested files. Default is the current directory when launching the application.
+
+### Grading Policy
+1. Implement HTTP server library: 3 Marks
+2. Implement GET /: 2 Marks
+3. Implement GET /filename: 2 Marks
+4. Implement POST /filename: 2 Marks
+5. Security Hardening: 0.5 Marks
+6. Error handling: 0.5 Marks
+#### Optional Tasks (2 Marks)
+1. Support Concurrent Requests: 1 Marks
+2. Support Content-Type and Content-Disposition: 1 Marks
