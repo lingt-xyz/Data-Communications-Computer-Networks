@@ -19,7 +19,9 @@
     - Two clients are reading the same file.
 
 6. (optional) Implement the support for Content-Type and Content-Disposition headers.
-    Set appropriate values to the headers Content-Type and Content-Disposition headers for ‘GET /file’ requests. For more details, the you could consult [5][6].
+    Set appropriate values to the headers Content-Type and Content-Disposition headers for ‘GET /file’ requests. For more details, the you could consult 
+    [5](https://www.w3.org/Protocols/rfc1341/4_Content-Type.html)
+    [6](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition).
 
 ### Usage
 httpfs is a simple file server.
