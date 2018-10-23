@@ -6,7 +6,7 @@ import MockHttp
 class Parameter:
     url = None
     verbose = False
-    contentType = None
+    headers = None
     bodyData = None
     writeFileName = None
     
@@ -14,7 +14,7 @@ class Parameter:
     def reInit():
         Parameter.url = None
         Parameter.verbose = False
-        Parameter.contentType = None
+        Parameter.headers = None
         Parameter.bodyData = None
         Parameter.writeFileName = None
 
@@ -41,7 +41,7 @@ def sendHttpRequest(command):
     if ("-v" in command):
         Parameter.verbose = True
     if ("-h" in command):
-        Parameter.contentType = getHeaders(command)
+        Parameter.headers = getHeaders(command)
 
     urlString = command.split(" ")[-1]
     if("'" in urlString):
@@ -66,11 +66,11 @@ def sendHttpRequest(command):
                         readFileName = command.split(" -f ")[1].split(" ")[0]
                         with open(readFileName, 'r') as f:
                             Parameter.bodyData = f.read()
-                    request = MockHttp.HttpRequest(host, o.path, Parameter.bodyData, Parameter.contentType)
+                    request = MockHttp.HttpRequest(host, o.path, Parameter.bodyData, Parameter.headers)
                     s.sendall(request.getPost())
 
                 else:
-                    request = MockHttp.HttpRequest(host, o.path, o.query, Parameter.contentType)
+                    request = MockHttp.HttpRequest(host, o.path, o.query, Parameter.headers)
                     s.sendall(request.getGet())
                 
                 data = recvall(s)
@@ -96,7 +96,8 @@ def sendHttpRequest(command):
 
 
 def getHeaders(command):
-    return re.findall('.* (-h (.*):(.*))* .*', command);
+    pairs = re.findall("-h (.+?:.+?) ", command);
+    return "\r\n".join(pairs)
     #return command.split(" -h ")[1].split(" ")[0]
 
 def recvall(sock):

@@ -45,11 +45,11 @@ Via: 1.1 vegur
 
 class HttpRequest:
 
-  def __init__(self, host, path, query, content_type):
+  def __init__(self, host, path, query, headers):
     self.path = path
     self.host = host
     self.query = query
-    self.content_type = content_type
+    self.headers = headers
 
   def getGet(self):
     return  ( "GET "+ self.path + "?" + self.query + " HTTP/1.0\r\n"
@@ -57,7 +57,7 @@ class HttpRequest:
 
   def getPost(self):
     headers = ( "POST {path} HTTP/1.0\r\n"
-                "{content_type}\r\n"
+                "{headers}\r\n"
                 "Content-Length: {content_length}\r\n"
                 "Host: {host}\r\n"
                 "User-Agent: Concordia-HTTP/1.0\r\n"
@@ -66,7 +66,7 @@ class HttpRequest:
     body_bytes = self.query.encode('utf-8')                              
     header_bytes = headers.format(
         path=self.path,
-        content_type=self.content_type,
+        headers=self.headers,
         content_length=len(self.query),
         host=self.host
     ).encode('utf-8')
