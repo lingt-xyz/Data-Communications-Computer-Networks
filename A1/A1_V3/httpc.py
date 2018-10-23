@@ -9,6 +9,7 @@ class Parameter:
     headers = None
     bodyData = None
     writeFileName = None
+    port = 8080
     
     @staticmethod
     def reInit():
@@ -54,9 +55,13 @@ def sendHttpRequest(command):
     if (command.startswith("get") or command.startswith("post")):
         o = urlparse(Parameter.url)
         host = o.hostname
+        if(o.port is None):
+            port = Parameter.port
+        else:
+            port = o.port
         while(True):
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.connect((host, 80))
+                s.connect((host, port))
 
                 if(command.startswith("post")):
                     if ("-d" in command and "-f" not in command):
