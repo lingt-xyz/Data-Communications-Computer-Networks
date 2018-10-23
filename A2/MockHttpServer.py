@@ -1,5 +1,6 @@
 import socket
 import threading
+import logging, sys
 
 class MockHttpServer:
 
@@ -19,26 +20,30 @@ class MockHttpServer:
 			print('Web server is listening at', self.port)
 			while True:
 				(client, address) = listener.accept()
+				logging.debug("Received a connection from {0}".format(address))
 				threading.Thread(target=self.response, args=(client, address)).start()
 		finally:
 			print("Shuting down the server...")
 			listener.close()
-			print('Web server is shut down at', self.port)
+			print('Web server has been shut down at', self.port)
 
 	def response(self, client, address):
+		# convert bytes to string
 		data = self.recvall(client).decode("utf=8")
-		print(data)
+		logging.debug("Received the data: \r\n{0}".format(data))
 		(http_header, http_body) = data.split('\r\n\r\n')
 		lines = http_header.split('\r\n')
 		(method, resource, http_version) = lines[0].split(' ')
 		# do we need Content-Type? json, xml, plain
+		logging.debug("Received the {0} request.".format(method))
 		if(method == "GET"):
-			print("GET")
+			logging.debug("Received the GET request.")
 		elif(method == "POST"):
-			print("POST")
+			logging.debug("Received the POST request.")
 		else:
-			print("Unsupported.")
-		
+			logging.error("Unsupported Method.")
+
+	# read all content from client
 	def recvall(self, client):
 		data = b''
 		while True:
@@ -49,6 +54,6 @@ class MockHttpServer:
 				break
 		return data
 
-
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 server = MockHttpServer()
 server.start()

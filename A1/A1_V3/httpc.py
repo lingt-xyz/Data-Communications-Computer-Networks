@@ -71,17 +71,17 @@ def sendHttpRequest(command):
                         readFileName = command.split(" -f ")[1].split(" ")[0]
                         with open(readFileName, 'r') as f:
                             Parameter.bodyData = f.read()
-                    request = MockHttp.HttpRequest(host, o.path, Parameter.bodyData, Parameter.headers)
+                    request = MockHttpClient.HttpRequest(host, o.path, Parameter.bodyData, Parameter.headers)
                     s.sendall(request.getPost())
 
                 else:
-                    request = MockHttp.HttpRequest(host, o.path, o.query, Parameter.headers)
+                    request = MockHttpClient.HttpRequest(host, o.path, o.query, Parameter.headers)
                     s.sendall(request.getGet())
                 
                 data = recvall(s)
-            response = MockHttp.HttpResponse(data)
+            response = MockHttpClient.HttpResponse(data)
 
-            if(response.code == MockHttp.HttpCode.redirect):
+            if(response.code == MockHttpClient.HttpCode.redirect):
                 host = response.location
             else:
                 break
