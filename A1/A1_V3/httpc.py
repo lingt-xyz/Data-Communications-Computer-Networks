@@ -1,5 +1,6 @@
 import socket
 from urllib.parse import urlparse
+import re
 import MockHttp
 
 class Parameter:
@@ -40,7 +41,7 @@ def sendHttpRequest(command):
     if ("-v" in command):
         Parameter.verbose = True
     if ("-h" in command):
-        Parameter.contentType = getFormat(command)
+        Parameter.contentType = getHeaders(command)
 
     urlString = command.split(" ")[-1]
     if("'" in urlString):
@@ -94,8 +95,9 @@ def sendHttpRequest(command):
         print("Invalid command.")
 
 
-def getFormat(command):
-    return command.split(" -h ")[1].split(" ")[0]
+def getHeaders(command):
+    return re.findall('.* (-h (.*):(.*))* .*', command);
+    #return command.split(" -h ")[1].split(" ")[0]
 
 def recvall(sock):
     BUFF_SIZE = 1024 # 1 KiB
