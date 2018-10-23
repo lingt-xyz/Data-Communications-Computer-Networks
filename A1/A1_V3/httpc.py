@@ -1,7 +1,7 @@
 import socket
 from urllib.parse import urlparse
 import re
-import MockHttp
+import MockHttpClient
 
 class Parameter:
     url = None
@@ -9,7 +9,7 @@ class Parameter:
     headers = None
     bodyData = None
     writeFileName = None
-    port = 8080
+    port = 80
     
     @staticmethod
     def reInit():
