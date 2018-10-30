@@ -72,12 +72,13 @@ def sendHttpRequest(command):
                         with open(readFileName, 'r') as f:
                             Parameter.bodyData = f.read()
                     request = MockHttpClient.HttpRequest(host, o.path, Parameter.bodyData, Parameter.headers)
+                    #print(request.getPost().decode('utf-8'))
                     s.sendall(request.getPost())
 
                 else:
                     request = MockHttpClient.HttpRequest(host, o.path, o.query, Parameter.headers)
+                    #print(request.getGet().decode('utf-8'))
                     s.sendall(request.getGet())
-                
                 data = recvall(s)
             response = MockHttpClient.HttpResponse(data)
 
