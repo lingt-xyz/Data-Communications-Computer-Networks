@@ -17,3 +17,19 @@ pairs = re.findall("-h ([\w-]+:[\w-]+)", s2)
 s3 = "post -h Content-Type:application/json -h ano12#:123D- http://httpbin.org/post"
 pairs = re.findall("-h (.+?:.+?) ", s3)
 print("\r\n".join(pairs))
+
+m = re.match(r"/([\w_]+)\?", '/foo_123_?')
+if(m):
+	print(m.group(1))
+
+m = re.match(r"/([\w_]+)\?", '/foo_123_')
+if(m):
+	print(m.group(1))
+else:
+	print("no match")
+
+m = re.match(r"/([\w_]+)", '/foo_123_')
+if(m):
+	print(m.group(1))
+else:
+	print("no match")
