@@ -40,7 +40,7 @@ class MockHttpServer:
 		request = MockHttpRequest(data)
 		logging.debug("Received the {0} request.".format(request.method))
 		pprint(vars(request))
-		client.send('something')
+		client.send('HTTP/1.1 200 OK\r\n\r\nsomething'.encode("utf-8"))
 		client.close()
 
 	# read all content from client
