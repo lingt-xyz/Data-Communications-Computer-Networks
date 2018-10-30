@@ -29,7 +29,7 @@ class MockHttpServer:
 
 	def response(self, client, address):
 		# convert bytes to string
-		data = self.recvall(client).decode("utf=8")
+		data = self.recvall(client).decode("utf-8")
 		logging.debug("Received the data: \r\n{0}".format(data))
 		(http_header, http_body) = data.split('\r\n\r\n')
 		lines = http_header.split('\r\n')
