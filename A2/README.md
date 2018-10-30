@@ -45,9 +45,9 @@ usage: `httpfs [-v] [-p PORT] [-d PATH-TO-DIR]`
 ### Test cases
 ```
 python3 httpc.py
-get 'http://localhost:8090/'
-
-get 'http://localhost:8090/foo'
+get 'http://localhost:8080/'
+get 'http://localhost:8080/foo'
+post -h Content-Type:application/json -d '{"": somecontent}' http://localhost:8080/filename
 
 python3 httpfs.py -v -p 8090
 
