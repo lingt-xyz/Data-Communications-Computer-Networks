@@ -41,3 +41,15 @@ usage: `httpfs [-v] [-p PORT] [-d PATH-TO-DIR]`
 #### Optional Tasks (2 Marks)
 1. Support Concurrent Requests: 1 Marks
 2. Support Content-Type and Content-Disposition: 1 Marks
+
+### Test cases
+```
+python3 httpc.py
+get 'http://localhost:8090/'
+
+get 'http://localhost:8090/foo'
+
+python3 httpfs.py -v -p 8090
+
+
+```
