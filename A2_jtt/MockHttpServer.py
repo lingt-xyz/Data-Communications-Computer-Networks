@@ -64,6 +64,23 @@ class MockHttpServer:
 				break
 		return data
 
+	def status_phrase_maping(status):
+		phrase = ''
+		if status == 200:
+			phrase = 'OK'
+		if status == 301:
+			phrase = 'Moved Permanently'
+		if status == 400:
+			phrase = 'Bad Request'
+		if status == 404:
+			phrase = 'Not Found'
+		if status == 505:
+			phrase = 'HTTP Version Not Supported'
+		return phrase
+
+
+
+
 # Usage: python3 httpfs [-v] [-p PORT] [-d PATH-TO-DIR]
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", help="output log", action='store_true')
