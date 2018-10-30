@@ -1,6 +1,7 @@
 import socket
 import threading
 import logging, sys
+from fileType import dealFile
 
 class MockHttpServer:
 
@@ -22,6 +23,7 @@ class MockHttpServer:
 				(client, address) = listener.accept()
 				logging.debug("Received a connection from {0}".format(address))
 				threading.Thread(target=self.response, args=(client, address)).start()
+
 		finally:
 			print("Shuting down the server...")
 			listener.close()
