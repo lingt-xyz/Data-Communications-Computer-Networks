@@ -23,7 +23,7 @@ class MockHttpServer:
 			logging.info('Web server is listening at {}.'.format(self.port))
 			while True:
 				(client, address) = listener.accept()
-				logging.debug("Received a connection from {0}".format(address))
+				logging.debug("Received a connection from {0}.".format(address))
 				threading.Thread(target=self.response, args=(client, address)).start()
 
 		finally:
