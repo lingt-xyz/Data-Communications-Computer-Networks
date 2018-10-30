@@ -101,7 +101,7 @@ def sendHttpRequest(command):
 
 
 def getHeaders(command):
-    pairs = re.findall("-h (.+?:.+?) ", command);
+    pairs = re.findall("-h (.+?:.+?) ", command)
     return "\r\n".join(pairs)
     #return command.split(" -h ")[1].split(" ")[0]
 

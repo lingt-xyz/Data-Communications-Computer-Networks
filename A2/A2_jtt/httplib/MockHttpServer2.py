@@ -1,7 +1,7 @@
 import socket
 import threading
 import logging, sys
-from fileType import dealFile
+# from fileType import dealFile
 
 class MockHttpServer:
 
@@ -40,6 +40,12 @@ class MockHttpServer:
 		logging.debug("Received the {0} request.".format(method))
 		if(method == "GET"):
 			logging.debug("Received the GET request.")
+			if(resource == "/"):
+				logging.debug("Get file list")
+			elif(resource == ""):# /foo
+				logging.debug("Get file content")
+			else:
+				logging.error("Unsupported request.")
 		elif(method == "POST"):
 			logging.debug("Received the POST request.")
 		else:
