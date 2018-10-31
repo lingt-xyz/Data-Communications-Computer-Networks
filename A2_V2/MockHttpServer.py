@@ -5,7 +5,7 @@ from pprint import pprint
 #from MockHttpRequest import MockHttpRequest
 #from MockHttpResponse import MockHttpResponse
 
-from dealFile import FileApp
+from FileManager import FileManager
 
 class MockHttpServer:
 
@@ -33,7 +33,7 @@ class MockHttpServer:
 			listener.close()
 			logging.info('Web server has been shut down at {}.'.format(self.port))
 
-	def handler(conn, is_v, dir_path):
+	def handler(conn, is_v, dirPath):
 		try:
 			if is_v:
 				logging.info('*** receive a new request')
@@ -42,61 +42,61 @@ class MockHttpServer:
 				logging.info('* raw request:' + request)
 
 			# parse the request message
-			reqst_index = request.find('\r\n')
-			request_line = request[:reqst_index]
+			rqstIndex = request.find('\r\n')
+			requestLine = request[:rqstIndex]
 			if is_v:
-				logging.info('* request line:' + request_line)
-			reqst_index_contents = request_line.split()
-			reqst_method = reqst_index_contents[0]
-			reqst_url = reqst_index_contents[1]
+				logging.info('* request line:' + requestLine)
+			rqstIndexContents = requestLine.split()
+			rqstMethod = rqstIndexContents[0]
+			rqstUrl = rqstIndexContents[1]
 			if is_v:
-				logging.info('* request method:' + reqst_method)
-				logging.info('* request url:' + reqst_url)
-			body_index = request.find('\r\n\r\n') + 4
-			body_content = request[body_index:]
+				logging.info('* request method:' + rqstMethod)
+				logging.info('* request url:' + rqstUrl)
+			bodyIndex = request.find('\r\n\r\n') + 4
+			bodyContent = request[bodyIndex:]
 			if is_v:
-				logging.info('* body content:' + body_content)
+				logging.info('* body content:' + bodyContent)
 
 			# default value
 			status = 0
 			content = ''
-			content_type = ''
+			contentType = ''
 
 			# file app logic
-			if reqst_method == 'GET':
-				if reqst_url == '/':
-					fileapp = FileApp()
-					fileapp.get_all_files(dir_path)
+			if rqstMethod == 'GET':
+				if rqstUrl == '/':
+					fileapp = FileManager()
+					fileapp.get_all_files(dirPath)
 					status = fileapp.status
 					content = fileapp.content
-					content_type = fileapp.content_type
+					contentType = fileapp.content_type
 				else:
-					fileapp = FileApp()
-					file_name = reqst_url[1:]
-					fileapp.get_content(dir_path, file_name)
+					fileapp = FileManager()
+					fileName = rqstUrl[1:]
+					fileapp.get_content(dirPath, fileName)
 					status = fileapp.status
 					content = fileapp.content
-					content_type = fileapp.content_type
+					contentType = fileapp.content_type
 
-			elif reqst_method == 'POST':
-				fileapp = FileApp()
-				file_name = reqst_url[1:]
-				fileapp.post_content(dir_path, file_name, body_content)
+			elif rqstMethod == 'POST':
+				fileapp = FileManager()
+				fileName = rqstUrl[1:]
+				fileapp.post_content(dirPath, fileName, bodyContent)
 				if -is_v:
-					logging.info('*body-content:' + body_content)
+					logging.info('*body-content:' + bodyContent)
 				status = fileapp.status
 				content = fileapp.content
-				content_type = fileapp.content_type
+				contentType = fileapp.content_type
 
 			# response
 			# gmt_format = '%a, %d %b %Y %H:%M:%S GMT'
-			resp_msg = 'HTTP/1.1 ' + str(status) + ' ' + status_phrase_maping(status) + '\r\n'
-			resp_msg = resp_msg + 'Connection: close\r\n' + 'Content-Length: ' + str(len(content)) + '\r\n'
-			resp_msg = resp_msg + 'Content-Type: ' + content_type + '\r\n\r\n'
-			resp_msg = resp_msg + content
+			response_msg = 'HTTP/1.1 ' + str(status) + ' ' + status_phrase(status) + '\r\n'
+			response_msg = response_msg + 'Connection: close\r\n' + 'Content-Length: ' + str(len(content)) + '\r\n'
+			response_msg = response_msg + 'Content-Type: ' + contentType + '\r\n\r\n'
+			response_msg = response_msg + content
 			if is_v:
-				logging.info('*response msg:' + resp_msg)
-			conn.sendall(resp_msg.encode("utf-8"))
+				logging.info('*response msg:' + response_msg)
+			conn.sendall(response_msg.encode("utf-8"))
 
 		except IOError as e:
 			if is_v:
@@ -105,7 +105,7 @@ class MockHttpServer:
 			conn.close()
 
 
-def status_phrase_maping(status):
+def status_phrase(status):
 	phrase = ''
 	if status == 200:
 		phrase = 'OK'
