@@ -3,7 +3,7 @@ import json
 import threading
 
 
-class FileApp:
+class FileManager:
     lock = threading.Lock()
 
     def __init__(self):
@@ -12,7 +12,7 @@ class FileApp:
         self.content = ''
 
     def get_all_files(self, dir_url):
-        files = FileApp.files_list_in_dir(dir_url)
+        files = FileManager.files_list_in_dir(dir_url)
         output = {}
         f_list = []
         for f in files:
@@ -32,7 +32,7 @@ class FileApp:
             self.content = json.dumps(output)
             self.content_type = 'application/json'
         else:
-            files = FileApp.files_list_in_dir(dir_url)
+            files = FileManager.files_list_in_dir(dir_url)
             if file_name not in files:
                 output = {}
                 output['error'] = 404
@@ -41,24 +41,24 @@ class FileApp:
                 self.content = json.dumps(output)
                 self.content_type = 'application/json'
             else:
-                FileApp.lock.acquire()
+                FileManager.lock.acquire()
                 try:
                     with open(dir_url + '/' + file_name, 'r', errors="ignore") as file_obj:
                         content = file_obj.read()
                 finally:
-                    FileApp.lock.release()
+                    FileManager.lock.release()
 
                 self.status = 200
                 self.content = content
-                self.content_type = FileApp.get_content_type(file_name)
+                self.content_type = FileManager.get_content_type(file_name)
 
     def post_content(self, dir_url, file_name, content):
-        FileApp.lock.acquire()
+        FileManager.lock.acquire()
         try:
             with open(dir_url + '/' + file_name, 'w') as f:
                 f.write(content)
         finally:
-            FileApp.lock.release()
+            FileManager.lock.release()
 
         self.status = 200
         self.content = 'write in to ' + dir_url + '/' + file_name
