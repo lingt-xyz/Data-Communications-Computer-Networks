@@ -1,4 +1,43 @@
 import re
+import json
+
+def generate_xml(file_list):
+	xml = "<root>"
+	for value in file_list:
+		xml += ("<file>"+value+"</file>")
+	xml += "</root>"
+	return xml
+
+file_list = ["abc","123"]
+print(generate_xml(file_list))
+
+content = '{"":"somecontent"}'
+values = json.loads(content)
+print(values)
+print(type(values))
+for key, value in values.items():
+	print (value)
+
+resource = "12312321?"
+if(resource.endswith("?")):
+	resource = resource[:-1]
+print(resource)
+
+m = re.match(r"/(.+)(\?)?", '/foo_123_?')
+if(m):
+	print(m.group(1))
+
+m = re.match(r"/(.+)\?", '/foo_123_')
+if(m):
+	print(m.group(1))
+else:
+	print("no match")
+
+m = re.match(r"/([\w_]+)", '/foo_123_')
+if(m):
+	print(m.group(1))
+else:
+	print("no match")
 
 def getHeaders(command):
     return re.findall('.* (-h (.*):(.*))* .*', command);
