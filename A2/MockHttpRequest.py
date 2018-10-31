@@ -56,9 +56,12 @@ class MockHttpRequest:
 				self.fileName = m.group(1)
 				self.fileContent = http_body
 				self.contentType = "application/json"
+				self.contentDisposition = "inline"
 				for line in lines:
 					if("Content-Type" in line):
 						self.contentType = line.split(':')[1]
+					if("Content-Disposition" in line):
+						self.contentDisposition = line.split(':')[1]
 			else:
 				self.operation = Operation.Invalid			
 		else:
