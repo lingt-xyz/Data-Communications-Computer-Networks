@@ -36,26 +36,26 @@ class MockHttpServer:
 	def handler(conn, is_v, dir_path):
 		try:
 			if is_v:
-				print('*** receive a new request')
+				logging.info('*** receive a new request')
 			request = conn.recv(1024).decode("utf-8")
 			if is_v:
-				print('* raw request:' + request)
+				logging.info('* raw request:' + request)
 
 			# parse the request message
 			reqst_index = request.find('\r\n')
 			request_line = request[:reqst_index]
 			if is_v:
-				print('* request line:' + request_line)
+				logging.info('* request line:' + request_line)
 			reqst_index_contents = request_line.split()
 			reqst_method = reqst_index_contents[0]
 			reqst_url = reqst_index_contents[1]
 			if is_v:
-				print('* request method:' + reqst_method)
-				print('* request url:' + reqst_url)
+				logging.info('* request method:' + reqst_method)
+				logging.info('* request url:' + reqst_url)
 			body_index = request.find('\r\n\r\n') + 4
 			body_content = request[body_index:]
 			if is_v:
-				print('* body content:' + body_content)
+				logging.info('* body content:' + body_content)
 
 			# default value
 			status = 0
@@ -83,7 +83,7 @@ class MockHttpServer:
 				file_name = reqst_url[1:]
 				fileapp.post_content(dir_path, file_name, body_content)
 				if -is_v:
-					print('*body-content:' + body_content)
+					logging.info('*body-content:' + body_content)
 				status = fileapp.status
 				content = fileapp.content
 				content_type = fileapp.content_type
@@ -95,7 +95,7 @@ class MockHttpServer:
 			resp_msg = resp_msg + 'Content-Type: ' + content_type + '\r\n\r\n'
 			resp_msg = resp_msg + content
 			if is_v:
-				print('*response msg:' + resp_msg)
+				logging.info('*response msg:' + resp_msg)
 			conn.sendall(resp_msg.encode("utf-8"))
 
 		except IOError as e:
