@@ -52,8 +52,13 @@ class HttpRequest:
     self.headers = headers
 
   def getGet(self):
-    return  ( "GET "+ self.path + "?" + self.query + " HTTP/1.0\r\n"
-              "Host:" + self.host + "\r\n\r\n").encode('utf-8')
+    headers = ( "GET "+ self.path + "?" + self.query + " HTTP/1.0\r\n"
+                "{headers}\r\n"
+                "Host:" + self.host + "\r\n\r\n")
+    header_bytes = headers.format(
+        headers=self.headers
+    ).encode('utf-8')
+    return  header_bytes
 
   def getPost(self):
     headers = ( "POST {path} HTTP/1.0\r\n"
