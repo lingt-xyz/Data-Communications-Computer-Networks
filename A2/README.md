@@ -46,6 +46,7 @@ usage: `httpfs [-v] [-p PORT] [-d PATH-TO-DIR]`
 ```
 python3 httpc.py
 get 'http://localhost:8080/'
+get -v 'http://localhost:8080/'
 get -h Content-Type:application/json 'http://localhost:8080/'
 get -h Content-Type:text/xml 'http://localhost:8080/'
 
@@ -58,6 +59,8 @@ get -h Content-Disposition:inline 'http://localhost:8080/filename'
 post -h Content-Type:application/json -d '{"": "somethingelse"}' http://localhost:8080/foo
 
 python3 httpfs.py -v -p 8080
+
+python3 httpfs.py -v -d data -p 8090
 
 
 ```
