@@ -57,7 +57,7 @@ get -h Content-Disposition:inline 'http://localhost:8080/filename'
 
 post -h Content-Type:application/json -d '{"": "somethingelse"}' http://localhost:8080/foo
 
-python3 httpfs.py -v -p 8090
+python3 httpfs.py -v -p 8080
 
 
 ```
