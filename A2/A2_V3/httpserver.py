@@ -69,7 +69,10 @@ class MockHttpServer:
 
 	# deal the file request, generate response bytes string, according to HTTP standards.
 	def generateResponse(self, requestParser, dirPath):
-		if requestParser.method == HttpMethod.GetResource:
+		if requestParser.method == HttpMethod.Download:
+			status = 200
+			# TODO set header: Content-Disposition: attachment
+		elif requestParser.method == HttpMethod.GetResource:
 			status = 200
 			content = "" # TODO			
 			
@@ -163,8 +166,10 @@ class HttpRequestParser:
 			resource = resource[:-1]
 		if(method == HttpMethod.Get):
 			self.method = HttpMethod.Get
-			if(resource == "get" ):
+			if(resource == "/get" ):
 				self.operation = Operation.GetResource
+			elif(resource == "/download" ):
+				self.operation = Operation.Download
 			elif(resource == "/" ):
 				self.operation = Operation.GetFileList
 			else:
@@ -206,3 +211,4 @@ class Operation:
 	WriteFileContent = 3
 	GetResource = 4
 	PostResource = 5
+	Download = 6
