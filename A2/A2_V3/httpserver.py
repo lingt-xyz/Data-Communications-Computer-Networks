@@ -69,20 +69,29 @@ class MockHttpServer:
 
 	# deal the file request, generate response bytes string, according to HTTP standards.
 	def generateResponse(self, requestParser, dirPath):
-		# file app logic
-		fileapp = FileManager()
-
-		if requestParser.method == HttpMethod.Get:
-			if requestParser.operation == Operation.GetFileList:
-				fileapp.get_all_files(dirPath, requestParser.contentType)	
-			elif requestParser.operation == Operation.GetFileContent:
-				fileapp.get_content(dirPath, requestParser.fileName, requestParser.contentType)
+		if requestParser.method == HttpMethod.GetResource:
+			status = 200
+			content = "" # TODO			
 			
-		elif requestParser.method == HttpMethod.Post:
-			fileapp.post_content(dirPath, requestParser.fileName, requestParser.fileContent, requestParser.contentType)
+		elif requestParser.method == HttpMethod.PostResource:
+			status = 200
+			content = "" # TODO
 
-		status = fileapp.status
-		content = fileapp.content
+		else:
+			# file app logic
+			fileapp = FileManager()
+
+			if requestParser.method == HttpMethod.Get:
+				if requestParser.operation == Operation.GetFileList:
+					fileapp.get_all_files(dirPath, requestParser.contentType)	
+				elif requestParser.operation == Operation.GetFileContent:
+					fileapp.get_content(dirPath, requestParser.fileName, requestParser.contentType)
+			
+			elif requestParser.method == HttpMethod.Post:
+				fileapp.post_content(dirPath, requestParser.fileName, requestParser.fileContent, requestParser.contentType)
+
+			status = fileapp.status
+			content = fileapp.content
 
 		# response
 		response_msg = 'HTTP/1.1 ' + str(status) + ' ' + self.status_phrase(status) + '\r\n'
@@ -149,14 +158,14 @@ class HttpRequestParser:
 		for line in lines:
 			if("Content-Type" in line):
 				self.contentType = line.split(':')[1]
-			if("Content-Disposition" in line):
-				self.contentDisposition = line.split(':')[1]
 
 		if(resource.endswith("?")):
 			resource = resource[:-1]
 		if(method == HttpMethod.Get):
 			self.method = HttpMethod.Get
-			if(resource == "/" ):
+			if(resource == "get" ):
+				self.operation = Operation.GetResource
+			elif(resource == "/" ):
 				self.operation = Operation.GetFileList
 			else:
 				m = re.match(r"/(.+)", resource)
@@ -169,9 +178,12 @@ class HttpRequestParser:
 			self.method = HttpMethod.Post
 			m = re.match(r"/(.+)", resource)
 			if(m):
-				self.operation = Operation.WriteFileContent
-				self.fileName = m.group(1)
 				self.fileContent = http_body
+				if(m.group(1) == "post"):
+					self.operation = Operation.PostResource
+				else:				
+					self.operation = Operation.WriteFileContent
+					self.fileName = m.group(1)
 			else:
 				self.operation = Operation.Invalid			
 		else:
@@ -192,3 +204,5 @@ class Operation:
 	GetFileList = 1
 	GetFileContent = 2
 	WriteFileContent = 3
+	GetResource = 4
+	PostResource = 5
