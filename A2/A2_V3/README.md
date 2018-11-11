@@ -32,5 +32,5 @@ http://localhost:8080/download
 ```
 get 'http://localhost:8080/get'
 get 'http://localhost:8080/get?user=a'
-post -h Content-Type:application/json -d '{"assignment": "3"}' http://localhost:8080/post
+post -v -h Content-Type:application/json -d '{"assignment": "3"}' http://localhost:8080/post
 ```

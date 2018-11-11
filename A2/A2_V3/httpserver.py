@@ -69,32 +69,35 @@ class MockHttpServer:
 
 	# deal the file request, generate response bytes string, according to HTTP standards.
 	def generateResponse(self, requestParser, dirPath):
-		if requestParser.method == HttpMethod.Download:
-			status = 200
-			# TODO set header: Content-Disposition: attachment
-		elif requestParser.method == HttpMethod.GetResource:
-			status = 200
-			content = "" # TODO			
-			
-		elif requestParser.method == HttpMethod.PostResource:
-			status = 200
-			content = "" # TODO
+		# file app logic
+		fileapp = FileManager()
 
-		else:
-			# file app logic
-			fileapp = FileManager()
+		if requestParser.method == HttpMethod.Get:
+			if requestParser.operation == Operation.Download:
+				status = 200
+				# TODO set header: Content-Disposition: attachment
+			elif requestParser.operation == Operation.GetResource:
+				status = 200
+				content = "{\"args\": \"" + requestParser.getParameter +"\"}"
 
-			if requestParser.method == HttpMethod.Get:
-				if requestParser.operation == Operation.GetFileList:
-					fileapp.get_all_files(dirPath, requestParser.contentType)	
-				elif requestParser.operation == Operation.GetFileContent:
-					fileapp.get_content(dirPath, requestParser.fileName, requestParser.contentType)
-			
-			elif requestParser.method == HttpMethod.Post:
+			elif requestParser.operation == Operation.GetFileList:
+				fileapp.get_all_files(dirPath, requestParser.contentType)
+				status = fileapp.status
+				content = fileapp.content
+			elif requestParser.operation == Operation.GetFileContent:
+				fileapp.get_content(dirPath, requestParser.fileName, requestParser.contentType)
+				status = fileapp.status
+				content = fileapp.content
+		
+		elif requestParser.method == HttpMethod.Post:
+			if requestParser.operation == Operation.PostResource:
+				logging.debug("Regular post.")
+				status = 200
+				content = "{\"args\": {},\"data\": \"" + requestParser.fileContent + "\"}"
+			else:
 				fileapp.post_content(dirPath, requestParser.fileName, requestParser.fileContent, requestParser.contentType)
-
-			status = fileapp.status
-			content = fileapp.content
+				status = fileapp.status
+				content = fileapp.content
 
 		# response
 		response_msg = 'HTTP/1.1 ' + str(status) + ' ' + self.status_phrase(status) + '\r\n'
@@ -152,7 +155,8 @@ Connection: close
 class HttpRequestParser:
 	def __init__(self, data):
 		self.contentType = "application/json"
-		self.contentDisposition = "inline"
+		# self.contentDisposition = "inline"
+		self.getParameter = ""
 
 		(http_header, http_body) = data.split('\r\n\r\n')
 		lines = http_header.split('\r\n')
@@ -168,6 +172,7 @@ class HttpRequestParser:
 			self.method = HttpMethod.Get
 			if(resource == "/get" ):
 				self.operation = Operation.GetResource
+				# TODO /get /get?user=a /get?course=networking&assignment=1
 			elif(resource == "/download" ):
 				self.operation = Operation.Download
 			elif(resource == "/" ):
