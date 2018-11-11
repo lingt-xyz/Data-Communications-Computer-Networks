@@ -1,3 +1,4 @@
+import json
 import socket
 import threading
 import logging
@@ -171,15 +172,18 @@ class HttpRequestParser:
 			resource = resource[:-1]
 		if(method == HttpMethod.Get):
 			self.method = HttpMethod.Get
-			if(resource == "/get" ):
+			if(resource.startswith("/get")):
 				self.operation = Operation.GetResource
-				if (resource == "/get?"):
+				if(resource == "/get"):
+					self.getParameter = ""
+				else:
 					l,r = resource.split('?')
-					args = r.split('&')
-					for arg in args:
-						k, v = arg.split('=')
-					return k,v
-				# TODO /get /get?user=a /get?course=networking&assignment=1
+					output = {}
+					for kv in r.split('&'):
+						k, v = kv.split('=')
+						output[k] = v
+					self.getParameter = json.dumps(output)
+					# TODO /get /get?user=a /get?course=networking&assignment=1
 			elif(resource == "/download" ):
 				self.operation = Operation.Download
 			elif(resource == "/" ):
