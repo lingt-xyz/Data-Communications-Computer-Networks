@@ -175,7 +175,8 @@ class HttpRequestParser:
 				self.operation = Operation.GetResource
 				if (resource == "/get?"):
 					l,r = resource.split('?')
-					for arg in r:
+					args = r.split('&')
+					for arg in args:
 						k, v = arg.split('=')
 					return k,v
 				# TODO /get /get?user=a /get?course=networking&assignment=1
