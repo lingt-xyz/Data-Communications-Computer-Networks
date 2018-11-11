@@ -2,6 +2,7 @@ import socket
 import threading
 import logging
 import re
+from urllib.parse import urlparse
 from pprint import pprint
 #from MockHttpRequest import MockHttpRequest
 #from MockHttpResponse import MockHttpResponse
@@ -172,6 +173,11 @@ class HttpRequestParser:
 			self.method = HttpMethod.Get
 			if(resource == "/get" ):
 				self.operation = Operation.GetResource
+				if (resource == "/get?"):
+					l,r = resource.split('?')
+					for arg in r:
+						k, v = arg.split('=')
+					return k,v
 				# TODO /get /get?user=a /get?course=networking&assignment=1
 			elif(resource == "/download" ):
 				self.operation = Operation.Download
@@ -201,6 +207,8 @@ class HttpRequestParser:
 		self.version = version
 		self.contentDisposition = None # TODO
 		self.overwrite = False # TODO
+
+
 
 
 
