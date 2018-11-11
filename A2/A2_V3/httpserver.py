@@ -77,7 +77,8 @@ class MockHttpServer:
 		if requestParser.method == HttpMethod.Get:
 			if requestParser.operation == Operation.Download:
 				status = 200
-				# TODO set header: Content-Disposition: attachment
+				requestParser.contentType = "text/html"
+				content = "this is a download file for testig purpose."
 			elif requestParser.operation == Operation.GetResource:
 				status = 200
 				content = "{\"args\": \"" + requestParser.getParameter +"\"}"
@@ -104,6 +105,8 @@ class MockHttpServer:
 		# response
 		response_msg = 'HTTP/1.1 ' + str(status) + ' ' + self.status_phrase(status) + '\r\n'
 		response_msg = response_msg + 'Connection: close\r\n' + 'Content-Length: ' + str(len(content)) + '\r\n'
+		if requestParser.operation == Operation.Download:
+			response_msg = response_msg + 'Content-Disposition: attachment; filename="download.txt"\r\n'
 		response_msg = response_msg + 'Content-Type: ' + requestParser.contentType + '\r\n\r\n'
 		response_msg = response_msg + content
 		return response_msg.encode("utf-8")
