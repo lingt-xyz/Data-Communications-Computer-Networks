@@ -4,7 +4,7 @@ import threading
 import time
 
 
-class Packet_Sender:
+class PacketSender:
     """
     Packet represents a simulated UDP packet.
     """
@@ -56,22 +56,22 @@ class Packet_Sender:
 
     def await_acks(conn):
         print("awaiting acks")
-        while not Packet_Sender.acked_all_packets:
+        while not PacketSender.acked_all_packets:
             data, sender = conn.recvfrom(1024)
-            threading.Thread(target=Packet_Sender.handle_ack, args=(data,)).start()
+            threading.Thread(target=PacketSender.handle_ack, args=(data,)).start()
 
     def resend_packet_if_needed(conn, packet, destination):
-        while not packet.seq_num in Packet_Sender.acked_packets and not Packet_Sender.was_reset:
+        while not packet.seq_num in PacketSender.acked_packets and not PacketSender.was_reset:
             print("starting resend loop")
             time.sleep(0.5)
             acked_packets_lock.acquire()
-            if not packet.seq_num in Packet_Sender.acked_packets and not Packet_Sender.was_reset:
+            if not packet.seq_num in PacketSender.acked_packets and not PacketSender.was_reset:
                 print("resending packet " + str(packet.seq_num))
                 conn.sendto(packet.to_bytes(), destination)
             acked_packets_lock.release()
 
     def spawn_resend_thread(conn, packet, destination):
-        threading.Thread(target=Packet_Sender.resend_packet_if_needed, args=(conn, packet, destination)).start()
+        threading.Thread(target=PacketSender.resend_packet_if_needed, args=(conn, packet, destination)).start()
 
     @staticmethod
     def send_as_packets(data, conn, destination, peer_ip, peer_port):
@@ -80,7 +80,7 @@ class Packet_Sender:
         global next_seq_num
         global acked_all_packets
         global seq_num
-        Packet_Sender.reset()
+        PacketSender.reset()
         max_payload_length = Packet.MAX_LEN - Packet.MIN_LEN
 
         curr = [0, 0]
@@ -91,7 +91,7 @@ class Packet_Sender:
 
         remaining_data = len(data)
         if remaining_data > 0:
-            threading.Thread(target=Packet_Sender.await_acks, args=(conn,)).start()
+            threading.Thread(target=PacketSender.await_acks, args=(conn,)).start()
         # While there's still data to be sent
         while remaining_data > 0:
             # While there are less packets in transit than the window size
@@ -109,7 +109,7 @@ class Packet_Sender:
                     sent_packets += 1
                     remaining_data -= max_payload_length
                     seq_num += 1
-                    Packet_Sender.spawn_resend_thread(conn, p, destination)
+                    PacketSender.spawn_resend_thread(conn, p, destination)
                     print("not last packet")
                 else:
                     p = Packet(packet_type=PacketConstructor.data_type,
@@ -125,7 +125,7 @@ class Packet_Sender:
                     seq_num += 1
                     print("remaining data " + str(remaining_data))
                     print("is last packet")
-                    Packet_Sender.spawn_resend_thread(conn, p, destination)
+                    PacketSender.spawn_resend_thread(conn, p, destination)
             # Update the number of packets still in transit
             while next_seq_num in acked_packets:
                 next_seq_num += 1
@@ -135,4 +135,4 @@ class Packet_Sender:
             # Wait here until all packets have been acked
             pass
         print("RECEIVED ALL ACKS")
-        Packet_Sender.was_reset = True
+        PacketSender.was_reset = True

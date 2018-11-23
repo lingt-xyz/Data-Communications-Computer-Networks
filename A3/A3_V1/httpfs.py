@@ -2,6 +2,9 @@ from httpserver import MockHttpServer
 import sys
 import logging
 import argparse
+from packetConstructor import PacketConstructor
+from packetSender import PacketSender
+
 
 '''
 # Usage: python3 httpfs [-v] [-p PORT] [-d PATH-TO-DIR]
