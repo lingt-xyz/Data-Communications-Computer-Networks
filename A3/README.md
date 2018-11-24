@@ -22,6 +22,7 @@
 6. (optional) Support multiple clients at the server.
 
 ### Usage
+1. `router --port=3000 --drop-rate=0.2 --max-delay=10ms --seed=1`
 
 ### Grading Policy
 1. With reliable environment: 6 Marks
