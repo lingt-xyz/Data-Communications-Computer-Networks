@@ -1,6 +1,7 @@
 ### Tasks
 1. UDP.
 2. Automatic-Repeat-Request (ARQ) protocol: Selective Repeat ARQ/Selective Reject ARQ.
+	
 	Selective Repeat is part of the automatic repeat-request (ARQ). With selective repeat, the sender sends a number of frames specified by a window size even without the need to wait for individual ACK from the receiver as in Go-Back-N ARQ. The receiver may selectively  reject  a  single  frame,  which  may  be  retransmitted  alone;  this  contrasts with  other  forms  of  ARQ,  which  must  send  every  frame  from  that  point  again.  The  receiver  accepts  out-of-order frames and buffers them. The sender individually retransmits frames that have timed out.
 
 3. Mimicking the TCP three-way handshaking.
