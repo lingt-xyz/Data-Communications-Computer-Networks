@@ -11,6 +11,7 @@ from pprint import pprint
 from FileManager import FileManager
 from packetConstructor import PacketConstructor
 from packetSender import PacketSender
+from packet import Packet
 
 class MockHttpServer:
 
