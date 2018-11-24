@@ -18,6 +18,10 @@ class MockHttpServer:
 	BUFFER_SIZE = 1024 # 1 KiB
 	#HOST = 'localhost'
 
+
+	#TODO: def TCPConnect/ handle pck server/ handle pck client
+
+
 	# initialized port and data directory
 	def __init__(self, port=8080, d="."):
 		self.port = port
