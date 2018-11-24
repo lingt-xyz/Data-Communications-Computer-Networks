@@ -21,6 +21,8 @@ class MockHttpServer:
 
 	#TODO: def TCPConnect/ handle pck server/ handle pck client
 
+	#TODO: seperate handle pck and data
+
 
 	# initialized port and data directory
 	def __init__(self, port=8080, d="."):
@@ -39,6 +41,7 @@ class MockHttpServer:
 				(conn, address) = listener.accept()
 				logging.debug("Received a connection from {0}.".format(address))
 				threading.Thread(target=self.handler, args=(conn, address, self.dataDirectory)).start()
+				#TODO: target change to pck client handler
 
 		finally:
 			logging.info("Shuting down the server...")
