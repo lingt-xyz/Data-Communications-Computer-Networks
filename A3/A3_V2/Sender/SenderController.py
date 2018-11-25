@@ -1,21 +1,22 @@
 from socket import *
 from DealPackets.Packet import *
 from Sender.SelectiveRepeatSender import *
+from DealPackets.packetConstructor import *
 
 
 class SenderController:
     __window = None
     __socket = None
     __addr = None
-    __routerAddr = ('127.0.0.1', 3000)
+    __routerAddr = ('127.0.0.0', 3000)
     __packetBuilder = None
     __port = None
 
     def __init__(self, ip, port):
         if (str(ip).lower() == "localhost"):
-            ip = "127.0.0.1"
+            ip = "127.0.0.0"
 
-        #self.__packetBuilder = pkt with ip and port TODO
+        self.__packetBuilder = PacketConstructor(ip,port)
         self.__addr = (ip, port)
 
     def sendMessage(self, message):

@@ -4,11 +4,10 @@ from DealPackets.Packet import *
 
 class SenderWindow(Window):
     def __init__(self, message, sendPacket, getResponse):
-        '''''
-        #TODO: windowSize=math.ceil(len(message)/payload)
+        windowSize=math.ceil(len(message)/PAYLOAD_SIZE)
         super().__init__(windowSize, sendPacket, getResponse)
-        #0 - windowsize load msg into window
-        '''''
+        for i in range(0, self.windowSize):
+            self.frameData[i] = message[i * PAYLOAD_SIZE:(i + 1) * PAYLOAD_SIZE]
 
 
     def process(self):
