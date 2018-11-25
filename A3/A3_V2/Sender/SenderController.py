@@ -1,3 +1,4 @@
+import logging
 from socket import *
 from DealPackets.Packet import *
 from Sender.SenderWindow import *
@@ -6,44 +7,58 @@ from const import *
 
 
 class SenderController:
-    __window = None
-    __socket = None
-    __addr = None
+    __conn = None
     __routerAddr = None
     __packetBuilder = None
-    __port = None
 
-    def __init__(self, ip, port):
-        if (str(ip).lower() == LOCAL_HOST_ALIAS):
-            ip = LOCAL_HOST_IP
-        self.__addr = (ip, port)
-        self.__routerAddr = (LOCAL_HOST_IP, ROUTER_PORT)
-        self.__packetBuilder = PacketConstructor(ip,port)
-
+    def __init__(self):
+        self.__routerAddr = (ROUTER_IP,ROUTER_PORT)
+        self.__packetBuilder = PacketConstructor(SERVER_IP, SERVER_PORT)
+    
     """
     The client invoke this function to send http request
     """
     def sendMessage(self, message):
-        #self.__socket = socket(AF_INET, SOCK_DGRAM)
-        #self.__socket.settimeout(1)
-        self.__window = SenderWindow(message, self.sendPacket, self.getResponse)
-
-        if self.connect(self.__window.windowSize):
-            print("Connected")
-
-            while not self.__window.finished():
-                self.__window.process()
+        # first: connect
+        if(self.connect()):
+            # second: send message
+            window = SenderWindow(message)
+            while window.hasNext():
+                payload = window.getNext()
+                # ideally, we show throw this piece of code into a thread, so every frame can be handled correctly
+                # threading.Thread(target=self.sendPacket, args=(conn, payload)).start()
+                try:
+                    p = self.__packetBuilder.build(PACKET_TYPE_DATA)
+                    self.__conn.sendto(p.to_bytes(), self.__routerAddr)
+                    self.__conn.settimeout(timeout)
+                    logging.debug('Waiting for a response')
+                    response, sender = self.__conn.recvfrom(1024)
+                    p = Packet.from_bytes(response)
+                    logging.debug('Payload: {}'.format(p.payload.decode("utf-8")))
+                except socket.timeout:
+                    logging.err('No response after {}s'.format(timeout))
+                    # timeout: resend, but we need to reset the `send` status of the frame
+                    # TODO: callback?
+                
+            # third: disconnect
+            self.disConnect()
         else:
-            print("Can't establish connection")
+            logging.err("Cannot establish the connection to {}:{}.".format(SERVER_IP, SERVER_PORT))
 
-        self.__port = self.__socket.getsockname()[1]
-        self.__socket.close()
-
-    def sendPacket(self, packetType, sequenceNumber, content):
-        print("Sending packet type: " + str(packetType) + " with #" + str(sequenceNumber))
-        packet = self.__packetBuilder.build(packetType, sequenceNumber, content)
-        self.__socket.sendto(packet.getBytes(), self.__routerAddr)
-
+    def sendPacket(self, payload):
+        try:
+            p = self.__packetBuilder.build(PACKET_TYPE_DATA)
+            self.__conn.sendto(p.to_bytes(), self.__routerAddr)
+            self.__conn.settimeout(timeout)
+            logging.debug('Waiting for a response')
+            response, sender = self.__conn.recvfrom(1024)
+            p = Packet.from_bytes(response)
+            logging.debug('Payload: {}'.format(p.payload.decode("utf-8")))
+        except socket.timeout:
+            logging.err('No response after {}s'.format(timeout))
+            # timeout: resend, but we need to reset the `send` status of the frame
+            # TODO: callback?
+        
     def getResponse(self):
         try:
             data, addr = self.__socket.recvfrom(PACKET_SIZE)
@@ -54,18 +69,67 @@ class SenderController:
             print(e)
             return None
 
-    def connect(self, windowSize):
-
-        for i in range(0, 5):
-            print("Trying to connect: " + str(i))
-            self.sendPacket(PACKET_TYPE_SYN, 0, "")
-            response = self.getResponse()
-
-            if (response is not None and response.packet_type == PACKET_TYPE_SYN_AK):
-                self.sendPacket(PACKET_TYPE_AK, 0, str(windowSize))
-                return True
-
-        return False
-
-    def getSocketPort(self):
-        return self.__port
+    """
+    Three-way handshake
+    """
+    def connect(self):
+        logging.info("Connecting to {}:{}.".format(SERVER_IP, SERVER_PORT))
+        self.__conn = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        timeout = 5
+        try:
+            # send SYN
+            p = self.__packetBuilder.build(PACKET_TYPE_SYN)
+            self.__conn.sendto(p.to_bytes(), self.__routerAddr)
+            self.__conn.settimeout(timeout)
+            logging.debug('Waiting for a response')
+            # expecting SYN_ACK
+            response, sender = self.__conn.recvfrom(1024)
+            p = Packet.from_bytes(response)
+            logging.debug('Payload: {}'.format(p.payload.decode("utf-8")))
+        except socket.timeout:
+            logging.err('No response after {}s'.format(timeout))
+            self.__conn.close()
+            return False
+        
+        if(p.packet_type == PACKET_TYPE_SYN_AK):
+            # send ACK
+            p = self.__packetBuilder.build(PACKET_TYPE_AK)
+            self.__conn.sendto(p.to_bytes(), self.__routerAddr)
+            # no need to timeout, we know server is ready
+            return True
+        else:
+            logging.err("Unexpected packet: {}".format(p.packet_type))
+            self.__conn.close()
+            return False
+    
+    """
+    Disconnecting: FIN, ACK, FIN, ACK
+    """
+    def disConnect(self):
+        # TODO disconnection
+        logging.info("Disconnecting from {}:{}.".format(SERVER_IP, SERVER_PORT))
+        self.__conn = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        timeout = 5
+        try:
+            p = self.__packetBuilder.build(PACKET_TYPE_NONE)
+            self.__conn.sendto(p.to_bytes(), self.__routerAddr)
+    
+            # Try to receive a response within timeout
+            self.__conn.settimeout(timeout)
+            logging.debug('Waiting for a response')
+            response, sender = self.__conn.recvfrom(1024)
+            p = Packet.from_bytes(response)
+            logging.debug('Payload: {}'.format(p.payload.decode("utf-8")))
+        except socket.timeout:
+            logging.err('No response after {}s'.format(timeout))
+            self.__conn.close()
+            return False
+        
+        if(p.packet_type == PACKET_TYPE_SYN_AK):
+            p = self.__packetBuilder.build(PACKET_TYPE_AK)
+            self.__conn.sendto(p.to_bytes(), self.__routerAddr)
+            return True
+        else:
+            logging.err("Unexpected packet: {}".format(p.packet_type))
+            self.__conn.close()
+            return False
