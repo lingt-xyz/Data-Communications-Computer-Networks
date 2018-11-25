@@ -2,6 +2,7 @@ from socket import *
 from DealPackets.Packet import *
 from Sender.SenderWindow import *
 from DealPackets.packetConstructor import *
+from const import *
 
 
 class SenderController:
@@ -13,10 +14,10 @@ class SenderController:
     __port = None
 
     def __init__(self, ip, port):
-        if (str(ip).lower() == const.LOCAL_HOST_ALIAS):
-            ip = const.LOCAL_HOST_IP
+        if (str(ip).lower() == LOCAL_HOST_ALIAS):
+            ip = LOCAL_HOST_IP
         self.__addr = (ip, port)
-        self.__routerAddr = (const.LOCAL_HOST_IP, const.ROUTER_PORT)
+        self.__routerAddr = (LOCAL_HOST_IP, ROUTER_PORT)
         self.__packetBuilder = PacketConstructor(ip,port)
 
     """
