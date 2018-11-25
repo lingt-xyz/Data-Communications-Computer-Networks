@@ -8,20 +8,23 @@ class SenderController:
     __window = None
     __socket = None
     __addr = None
-    __routerAddr = ('127.0.0.0', 3000)
+    __routerAddr = None
     __packetBuilder = None
     __port = None
 
     def __init__(self, ip, port):
-        if (str(ip).lower() == "localhost"):
-            ip = "127.0.0.0"
-
-        self.__packetBuilder = PacketConstructor(ip,port)
+        if (str(ip).lower() == const.LOCAL_HOST_ALIAS):
+            ip = const.LOCAL_HOST_IP
         self.__addr = (ip, port)
+        self.__routerAddr = (const.LOCAL_HOST_IP, const.ROUTER_PORT)
+        self.__packetBuilder = PacketConstructor(ip,port)
 
+    """
+    The client invoke this function to send http request
+    """
     def sendMessage(self, message):
-        self.__socket = socket(AF_INET, SOCK_DGRAM)
-        self.__socket.settimeout(1)
+        #self.__socket = socket(AF_INET, SOCK_DGRAM)
+        #self.__socket.settimeout(1)
         self.__window = SenderWindow(message, self.sendPacket, self.getResponse)
 
         if self.connect(self.__window.windowSize):
@@ -41,10 +44,14 @@ class SenderController:
         self.__socket.sendto(packet.getBytes(), self.__routerAddr)
 
     def getResponse(self):
-        #TODO:
+        self.__socket = socket(AF_INET, SOCK_DGRAM)
+        self.__socket.settimeout(1)
+
 
     def connect(self, windowSize):
         #TODO:
+        self.__socket = socket(AF_INET, SOCK_DGRAM)
+        self.__socket.settimeout(1)
 
     def getSocketPort(self):
         return self.__port
