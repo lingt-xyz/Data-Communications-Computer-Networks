@@ -1,6 +1,6 @@
 from socket import *
 from DealPackets.Packet import *
-from Sender.SelectiveRepeatSender import *
+from Sender.SenderWindow import *
 from DealPackets.packetConstructor import *
 
 

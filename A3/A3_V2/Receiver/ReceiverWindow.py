@@ -14,9 +14,16 @@ class ReceiverWindow(Window):
         return True
 
     def process(self):
-        #timer TODO
+        #timer
+        timeis = time.time()
 
-        #TODO: Check each window if frame is handled or timed out
+        #Check each window if frame is handled or timed out
+        for i in range(self.windowStart, self.windowSize):
+            if (not self.frameHandled[i]):
+                if (timeis > (DEFAULT_WAIT_TIME + self.frameTimer[i])):
+                    self.sendPacket(PACKET_TYPE_AK, i - 1, "")
+
+                break
 
 
         # Wait for incoming data
@@ -30,10 +37,9 @@ class ReceiverWindow(Window):
                 break
 
     def handleResponse(self, packet):
-        '''''
-        if (packet.getPacketType() == DATA):
+
+        if (packet.packet_type == PACKET_TYPE_DATA):
             seq = packet.getSequenceNumber()
 
-            self.frameData[seq] = packet.getPayload()
+            self.frameData[seq] = packet.payload
             self.frameHandled[seq] = True
-        '''''

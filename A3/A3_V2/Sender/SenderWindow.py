@@ -43,7 +43,7 @@ class SenderWindow(Window):
         packetType = packet.packet_type;
 
 
-        if (packetType == PACKET_TYPE_AK):  
+        if (packetType == PACKET_TYPE_AK):
             seq = packet.getSequenceNumber()
 
             for i in range(0, seq + 1):

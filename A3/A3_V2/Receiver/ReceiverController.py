@@ -2,7 +2,7 @@ from socket import *
 from DealPackets.Packet import *
 from DealPackets.PacketDecoder import *
 from DealPackets.PacketBuilder import *
-from Receiver.SelectiveRepeatReceiver import *
+from Receiver.ReceiverWindow import *
 
 
 class ReceiverController:
