@@ -44,14 +44,27 @@ class SenderController:
         self.__socket.sendto(packet.getBytes(), self.__routerAddr)
 
     def getResponse(self):
-        self.__socket = socket(AF_INET, SOCK_DGRAM)
-        self.__socket.settimeout(1)
-
+        try:
+            data, addr = self.__socket.recvfrom(PACKET_SIZE)
+            packet = Packet.from_bytes(data)
+            print("Got packet type: " + str(packet.packet_type) + " with #" + str(packet.seq_num))
+            return packet
+        except Exception as e:
+            print(e)
+            return None
 
     def connect(self, windowSize):
-        #TODO:
-        self.__socket = socket(AF_INET, SOCK_DGRAM)
-        self.__socket.settimeout(1)
+
+        for i in range(0, 5):
+            print("Trying to connect: " + str(i))
+            self.sendPacket(PACKET_TYPE_SYN, 0, "")
+            response = self.getResponse()
+
+            if (response is not None and response.packet_type == PACKET_TYPE_SYN_AK):
+                self.sendPacket(PACKET_TYPE_AK, 0, str(windowSize))
+                return True
+
+        return False
 
     def getSocketPort(self):
         return self.__port
