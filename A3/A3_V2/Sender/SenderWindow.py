@@ -1,5 +1,5 @@
 from DealPackets.SelectiveRepeatWindow import *
-from DealPackets.packet import *
+from DealPackets.Packet import *
 
 
 class SenderWindow(Window):
