@@ -1,10 +1,13 @@
+import time
+import threading
+import math
 from DealPackets.SelectiveRepeatWindow import *
 from DealPackets.Packet import *
 
 
 class SenderWindow(Window):
     def __init__(self, message, sendPacket, getResponse):
-        windowSize=math.ceil(len(message)/PAYLOAD_SIZE)
+        windowSize= math.ceil(len(message)/PAYLOAD_SIZE)
         super().__init__(windowSize, sendPacket, getResponse)
         for i in range(0, self.windowSize):
             self.frameData[i] = message[i * PAYLOAD_SIZE:(i + 1) * PAYLOAD_SIZE]
@@ -12,9 +15,15 @@ class SenderWindow(Window):
 
     def process(self):
         #timer start
+        timeis = time.time()
 
 
-        # TODO: Check each window if frame is handled, if no or timed out, resend pkt
+        #Check each window if frame is handled, if no or timed out, resend pkt
+        for i in range(self.windowStart, self.windowSize):
+            if (not self.frameHandled[i]):
+                if (timeis > (DEFAULT_WAIT_TIME + self.frameTimer[i])):
+                    self.sendPacket(PACKET_TYPE_DATA, i, self.frameData[i])
+
 
 
         # Wait for feedback.
@@ -31,10 +40,10 @@ class SenderWindow(Window):
     def handleResponse(self, packet):
 
         # Figure out what kind of packet it is.
-        packetType = packet.getPacketType();
+        packetType = packet.packet_type;
 
-        '''''
-        if (packetType == AK): #TODO: pkt type 
+
+        if (packetType == PACKET_TYPE_AK):  
             seq = packet.getSequenceNumber()
 
             for i in range(0, seq + 1):
@@ -48,4 +57,4 @@ class SenderWindow(Window):
                     print("not in range")
         else:
             print(str(packetType))
-        '''''
+
