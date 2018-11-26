@@ -1,8 +1,8 @@
 from socket import *
 from DealPackets.Packet import *
-from DealPackets.PacketDecoder import *
-from DealPackets.PacketBuilder import *
+from DealPackets.packetConstructor import *
 from Receiver.ReceiverWindow import *
+
 
 
 class ReceiverController:
@@ -23,7 +23,20 @@ class ReceiverController:
 
     def getPacket(self, timeout=None):
         self.__socketRC.settimeout(timeout)
-       #TODO: decode pkt type and seq num
+        try:
+            data, addr = self.__socketRC.recvfrom(PACKET_SIZE)
+        except Exception as e:
+            print(e)
+            return None
+        pkt = Packet.from_bytes(data)
+        print("Got packet type: " + str(pkt.packet_type) + " with #" + str(pkt.seq_num))
+
+        if (self.__packetBuilder is None):
+            self.address = (pkt.getDestinationAddress(), pkt.getDestinationPort())
+            self.__packetBuilder = PacketConstructor(pkt.getDestinationAddress(), pkt.getDestinationPort())
+
+        return pkt
+
 
     def buildConnection(self):
         packet = self.getPacket()
