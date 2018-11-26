@@ -4,7 +4,6 @@ from DealPackets.packetConstructor import *
 from Receiver.ReceiverWindow import *
 
 
-
 class ReceiverController:
     address = None
     __socketRC = None
@@ -15,6 +14,15 @@ class ReceiverController:
 
     def __init__(self, port):
         self.__port = port
+
+    def receiveMessage(self):
+        """
+        Receive message from the client
+        """
+        # First, connect
+        # Second, receive request
+        # Third, response
+        # Fourth, Disconnect
 
     def sendPacket(self, packetType, sequenceNumber, content):
         print("Sending packet type: " + str(packetType) + " with #" + str(sequenceNumber))
@@ -37,12 +45,11 @@ class ReceiverController:
 
         return pkt
 
-
     def buildConnection(self):
         packet = self.getPacket()
 
-        #boolean if connection is built
-        #TODO: if pkt type is syn, send ack syn, if already acked, return true
+        # boolean if connection is built
+        # TODO: if pkt type is syn, send ack syn, if already acked, return true
 
         return False
 
@@ -53,8 +60,7 @@ class ReceiverController:
 
         # Make sure we have some connection.
         if (self.buildConnection()):
-
-            #TODO: if window not finished, keep doing till end, send ack pkt,
+            # TODO: if window not finished, keep doing till end, send ack pkt,
 
             return self.__window.getMessage()
 
