@@ -5,6 +5,7 @@ from DealPackets.SelectiveRepeatWindow import *
 from DealPackets.Packet import *
 from const import *
 
+#TODO: ? still think that should put Frame and window identities into SRW, inheritance
 class Frame:
     def __init__(self, data = None):
         self.data = data
