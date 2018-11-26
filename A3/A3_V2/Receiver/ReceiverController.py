@@ -20,9 +20,21 @@ class ReceiverController:
         Receive message from the client
         """
         # First, connect
+        self.__socketRC = socket(AF_INET, SOCK_DGRAM)
+        self.__socketRC.bind(('', self.__port))
+        print("Listening")
         # Second, receive request
         # Third, response
         # Fourth, Disconnect
+        if (self.buildConnection()):
+
+            while not self.__window.finished():
+                self.__window.process()
+
+            self.sendPacket(PACKET_TYPE_AK, self.__window.windowSize, "")
+            self.__socketRC.close()
+            return self.__window.getMessage()
+
 
     def sendPacket(self, packetType, sequenceNumber, content):
         print("Sending packet type: " + str(packetType) + " with #" + str(sequenceNumber))
@@ -50,9 +62,22 @@ class ReceiverController:
 
         # boolean if connection is built
         # TODO: if pkt type is syn, send ack syn, if already acked, return true
+        if (packet.packet_type == PACKET_TYPE_SYN):
+            addr = (packet.peer_ip_addr, packet.peer_port)
+            self.sendPacket(PACKET_TYPE_SYN_AK, 1, "")
+
+            packet = self.getPacket()
+
+            if (packet.packet_type == PACKET_TYPE_AK):
+                windowSize = int(packet.payload.rstrip())
+                self.__window = ReceiverWindow(windowSize, self.sendPacket, self.getPacket)
+                return True
 
         return False
 
+     #TODO: disconnect  
+
+    '''''
     def getMessage(self):
         self.__socketRC = socket(AF_INET, SOCK_DGRAM)
         self.__socketRC.bind(('', self.__port))
@@ -63,5 +88,5 @@ class ReceiverController:
             # TODO: if window not finished, keep doing till end, send ack pkt,
 
             return self.__window.getMessage()
-
+    '''''
 
