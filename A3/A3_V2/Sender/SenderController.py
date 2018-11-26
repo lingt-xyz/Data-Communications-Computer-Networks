@@ -28,7 +28,7 @@ class SenderController:
             threading.Thread(target=self.getResponse, args=(window)).start()
             while window.hasPendingPacket: # Not all packets have been sent
                 # Get next sendable packets if there is any in WINDOW
-                for frame in window.getFrames()
+                for frame in window.getFrames():
                     p = self.__packetBuilder.build(PACKET_TYPE_DATA, frame.index, frame.payload)
                     self.__conn.sendto(p.to_bytes(), self.__routerAddr)
                     frame.timer = time.time()
