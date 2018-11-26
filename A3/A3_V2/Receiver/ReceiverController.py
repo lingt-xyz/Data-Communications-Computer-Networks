@@ -75,7 +75,7 @@ class ReceiverController:
 
         return False
 
-     #TODO: disconnect  
+     #TODO: disconnect
 
     '''''
     def getMessage(self):
