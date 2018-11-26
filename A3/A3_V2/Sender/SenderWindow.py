@@ -100,4 +100,3 @@ class SenderWindow():
                     print("not in range")
         else:
             print(str(packetType))
-
