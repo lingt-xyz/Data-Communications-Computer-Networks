@@ -28,7 +28,7 @@ class ReceiverWindow(Window):
 
         # Wait for incoming data
         while (True):
-            response = self.getResponse(1)
+            response = self.getResponse()
 
             if (response is not None):
                 self.handleResponse(response)
@@ -39,7 +39,7 @@ class ReceiverWindow(Window):
     def handleResponse(self, packet):
 
         if (packet.packet_type == PACKET_TYPE_DATA):
-            seq = packet.getSequenceNumber()
+            seq = packet.seq_num
 
             self.frameData[seq] = packet.payload
             self.frameHandled[seq] = True
