@@ -26,7 +26,7 @@ class SenderWindow():
     """
     def hasNext(self):
         for i in range(self.pointer, self.pointer + WINDOW_SIZE):
-            if(!self.frames[i].send):
+            if(not self.frames[i].send):
                 return True
         return False
         
@@ -36,7 +36,7 @@ class SenderWindow():
     def getNext(self):
         for i in range(self.pointer, self.pointer + WINDOW_SIZE):
             f = self.frames[i]
-            if(!f.send):
+            if(not f.send):
                 f.send = True
                 return f
     
@@ -48,7 +48,7 @@ class SenderWindow():
         offset = 0
         for i in range(self.pointer, self.pointer + WINDOW_SIZE):
             if(self.frames[i].ACK):
-                offset++
+                offset = offset+1
             else:
                 break
         self.pointer += offset
