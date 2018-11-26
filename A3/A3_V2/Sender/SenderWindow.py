@@ -7,10 +7,12 @@ from const import *
 
 #TODO: ? still think that should put Frame and window identities into SRW, inheritance
 class Frame:
-    def __init__(self, data = None):
-        self.data = data
+    def __init__(self, index, payload = None):
+        self.index = index
+        self.payload = payload
         self.send = False
         self.ACK = False
+        self.timer = 0
 
 class SenderWindow():
     def __init__(self, message):
@@ -20,40 +22,42 @@ class SenderWindow():
         self.pointer = 0
         # init all packets
         for i in range(0, self.numberOfFrames):
-            self.frames[i] = Frame(message[i * PAYLOAD_SIZE:(i + 1) * PAYLOAD_SIZE])
+            self.frames[i] = Frame(i+1, message[i * PAYLOAD_SIZE:(i + 1) * PAYLOAD_SIZE])
 
-    """
-    Is any frame avaiable in the WINDOW to be sent
-    """
-    def hasNext(self):
-        for i in range(self.pointer, self.pointer + WINDOW_SIZE):
-            if(not self.frames[i].send):
-                return True
-        return False
-        
-    """
-    Get next sendable packet. Always use `hasNext` to check before call this function
-    """
-    def getNext(self):
+    def getFrames(self):
+        """
+        Get all sendable packets in WINDOW
+        """
+        frameList = []
         for i in range(self.pointer, self.pointer + WINDOW_SIZE):
             f = self.frames[i]
             if(not f.send):
                 f.send = True
-                return f
-    
-    """
-    When received an ACK, update WINDOW
-    """
-    def updateWindow(self, index):
+                frameList.append(f)
+        return frameList
+
+    def updateFrame(self, index):
+        """
+        When received an ACK, update WINDOW, slide WINDOW if necessary
+        """
         self.frames[index].ACK = True
         offset = 0
         for i in range(self.pointer, self.pointer + WINDOW_SIZE):
             if(self.frames[i].ACK):
-                offset = offset+1
+                offset+=1
             else:
                 break
         self.pointer += offset
-        
+
+    def hasPendingPacket(self):
+        """
+        Check whether all packets have been ACKed
+        """
+        for i in range(0, self.numberOfFrames):
+            if(not self.frames[i].ACK):
+                return True
+        return False
+
     def process(self):
         #timer start
         timeis = time.time()
@@ -80,7 +84,7 @@ class SenderWindow():
     def handleResponse(self, packet):
 
         # Figure out what kind of packet it is.
-        packetType = packet.packet_type;
+        packetType = packet.packet_type
 
 
         if (packetType == PACKET_TYPE_AK):
@@ -97,4 +101,3 @@ class SenderWindow():
                     print("not in range")
         else:
             print(str(packetType))
-
