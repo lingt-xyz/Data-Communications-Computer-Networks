@@ -1,10 +1,13 @@
 from DealPackets.SelectiveRepeatWindow import *
 
 
-class ReceiverWindow(Window):
+class ReceiverWindow():
 
-    def __init__(self, windowSize, sendPacket, getResponse):
-        super().__init__(windowSize, sendPacket, getResponse)
+    def __init__(self):
+        # where WINDOW starts from
+        self.pointer = 0
+        # WINDOW frames #TODO what's the size? Should use a list?
+        self.frames = []
 
     def finished(self):
         for i in range(0, self.windowSize):
@@ -13,28 +16,27 @@ class ReceiverWindow(Window):
 
         return True
 
-    def process(self):
-        #timer
-        timeis = time.time()
+    def process(self, p):
+	# Is it in WINDOW range?
+        index = p.seq_num - 1
+        if self.pointer <= index < self.pointer + WINDOW_SIZE
+            # check whether already received
+            if self.frames[index] is None:
+                self.frames[inex] = p
+                # should slide?
+                self.updateWindow()
+        else:
+            # discard this packet
+            pass
 
-        #Check each window if frame is handled or timed out
-        for i in range(self.windowStart, self.windowSize):
-            if (not self.frameHandled[i]):
-                if (timeis > (DEFAULT_WAIT_TIME + self.frameTimer[i])):
-                    self.sendPacket(PACKET_TYPE_AK, i - 1, "")
-
-                break
-
-
-        # Wait for incoming data
-        while (True):
-            response = self.getResponse()
-
-            if (response is not None):
-                self.handleResponse(response)
+    def updateWindow(self):
+	for i in range(self.pointer, self.pointer + WINDOW_SIZE):
+            # TODO check indexOutOfBoundException
+            if(self.frames[i] is not None):
+                offset+=1
             else:
-                print("No response")
                 break
+        self.pointer += offset
 
     def handleResponse(self, packet):
 

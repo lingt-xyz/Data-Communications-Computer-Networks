@@ -19,7 +19,7 @@ class SenderWindow():
     def __init__(self, message):
         # number of packets
         self.numberOfFrames = math.ceil(len(message)/PAYLOAD_SIZE)
-        # where the window starts from
+        # where WINDOW starts from
         self.pointer = 0
         # init all packets
         for i in range(0, self.numberOfFrames):

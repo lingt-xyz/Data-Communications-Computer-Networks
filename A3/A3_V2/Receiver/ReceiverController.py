@@ -8,13 +8,10 @@ from Receiver.ReceiverWindow import *
 class ReceiverController:
     address = None
     __socketRC = None
-    __routerAddr = ('127.0.0.1', 3000)
     __packetBuilder = None
-    __window = None
-    __port = None
 
-    def __init__(self, port):
-        self.__port = port
+    def __init__(self):
+        self.__routerAddr = (ROUTER_IP,ROUTER_PORT)
 
     def receiveMessage(self):
         """
@@ -25,12 +22,13 @@ class ReceiverController:
         if (self.buildConnection()):
 
             # Second, receive request
-            while not self.__window.finished():
-                self.__window.process()
+            window = ReceiverWindow()
+            while not window.finished():
+                p = self.getPacket()
+                # TODO discard possible packet from handshake
+                window.process(p)
+                # TODO send ACK
 
-            self.sendPacket(PACKET_TYPE_AK, self.__window.windowSize, "")
-            self.__socketRC.close()
-            return self.__window.getMessage()
             # Third, response
 
         # Fourth, Disconnect
@@ -61,7 +59,7 @@ class ReceiverController:
 	Three-way handshake
 	"""
         self.__socketRC = socket(AF_INET, SOCK_DGRAM)
-        self.__socketRC.bind(('', self.__port))
+        self.__socketRC.bind(('', SERVER_PORT))
         logging.info("Server is listening at {}:{}.".format(SERVER_IP, SERVER_PORT))
 
         packet = self.getPacket()
