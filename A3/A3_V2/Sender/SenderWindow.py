@@ -13,6 +13,7 @@ class Frame:
         self.send = False
         self.ACK = False
         self.timer = 0
+        self.frames = []
 
 class SenderWindow():
     def __init__(self, message):
@@ -30,6 +31,7 @@ class SenderWindow():
         """
         frameList = []
         for i in range(self.pointer, self.pointer + WINDOW_SIZE):
+            # TODO check indexOutOfBoundException
             f = self.frames[i]
             if(not f.send):
                 f.send = True
@@ -43,6 +45,7 @@ class SenderWindow():
         self.frames[index].ACK = True
         offset = 0
         for i in range(self.pointer, self.pointer + WINDOW_SIZE):
+            # TODO check indexOutOfBoundException
             if(self.frames[i].ACK):
                 offset+=1
             else:
