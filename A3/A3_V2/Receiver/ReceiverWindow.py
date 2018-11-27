@@ -8,13 +8,10 @@ class ReceiverWindow():
         self.pointer = 0
         # WINDOW frames #TODO what's the size? Should use a list?
         self.frames = []
+        self.fini = False
 
     def finished(self):
-        for i in range(0, self.windowSize):
-            if not self.frameHandled[i]:
-                return False
-
-        return True
+        return self.fini
 
     def process(self, p):
 	# Is it in WINDOW range?
@@ -37,14 +34,15 @@ class ReceiverWindow():
 	# TODO check is it last packet?
 	last = False
 	if last:
+            self.fini = True
 	else:
-	for i in range(self.pointer, self.pointer + WINDOW_SIZE):
-            # TODO check indexOutOfBoundException
-            if(self.frames[i] is not None):
-                offset+=1
-            else:
-                break
-        self.pointer += offset
+            for i in range(self.pointer, self.pointer + WINDOW_SIZE):
+                # TODO check indexOutOfBoundException
+                if(self.frames[i] is not None):
+                    offset+=1
+                else:
+                    break
+            self.pointer += offset
 
     def handleResponse(self, packet):
 
