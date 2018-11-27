@@ -23,13 +23,21 @@ class ReceiverWindow():
             # check whether already received
             if self.frames[index] is None:
                 self.frames[inex] = p
-                # should slide?
-                self.updateWindow()
+                # Should slide? Is it last one?
+                self.updateWindow(p)
         else:
             # discard this packet
             pass
 
-    def updateWindow(self):
+    def updateWindow(self,p):
+	"""
+	If the packet is the last one, set Finished status
+	Else, update WINDOW
+	"""
+	# TODO check is it last packet?
+	last = False
+	if last:
+	else:
 	for i in range(self.pointer, self.pointer + WINDOW_SIZE):
             # TODO check indexOutOfBoundException
             if(self.frames[i] is not None):
