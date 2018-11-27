@@ -4,6 +4,7 @@ from socket import *
 from DealPackets.Packet import *
 from DealPackets.packetConstructor import *
 from Client.ClientWindow import *
+from DealPackets.SelectiveRepeatWindow import *
 from const import *
 
 

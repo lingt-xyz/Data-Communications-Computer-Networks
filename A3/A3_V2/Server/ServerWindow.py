@@ -19,7 +19,7 @@ class ServerWindow():
         if self.pointer <= index < self.pointer + WINDOW_SIZE
             # check whether already received
             if self.frames[index] is None:
-                self.frames[inex] = p
+                self.frames[index] = p
                 # Should slide? Is it last one?
                 self.updateWindow(p)
         else:
