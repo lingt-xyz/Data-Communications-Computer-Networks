@@ -65,7 +65,7 @@ class ReceiverController:
         if (packet.packet_type == PACKET_TYPE_SYN):
             addr = (packet.peer_ip_addr, packet.peer_port)
             self.sendPacket(PACKET_TYPE_SYN_AK, 1, "")
-
+ 
             packet = self.getPacket()
 
             if (packet.packet_type == PACKET_TYPE_AK):
@@ -75,7 +75,12 @@ class ReceiverController:
 
         return False
 
-     #TODO: disconnect
+    def disConnect(self):
+        """
+        Disconnecting: FIN, ACK, FIN, ACK
+        """
+        logging.info("Disconnecting from {}:{}.".format(self.__packetBuilder.__destinationAddress, self.__packetBuilder.destinationPort))
+        self.__conn.close()
 
     '''''
     def getMessage(self):
