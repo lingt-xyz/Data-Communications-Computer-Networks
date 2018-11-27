@@ -1,3 +1,4 @@
+import logging
 from socket import *
 from DealPackets.Packet import *
 from DealPackets.packetConstructor import *
@@ -20,23 +21,22 @@ class ReceiverController:
         Receive message from the client
         """
         # First, connect
-        self.__socketRC = socket(AF_INET, SOCK_DGRAM)
-        self.__socketRC.bind(('', self.__port))
-        print("Listening")
-        # Second, receive request
-        # Third, response
-        # Fourth, Disconnect
+
         if (self.buildConnection()):
 
+            # Second, receive request
             while not self.__window.finished():
                 self.__window.process()
 
             self.sendPacket(PACKET_TYPE_AK, self.__window.windowSize, "")
             self.__socketRC.close()
             return self.__window.getMessage()
+            # Third, response
 
+        # Fourth, Disconnect
+        self.disConnect()
 
-    def sendPacket(self, packetType, sequenceNumber, content):
+    def sendPacket(self, packetType, sequenceNumber, content=None):
         print("Sending packet type: " + str(packetType) + " with #" + str(sequenceNumber))
         packet = self.__packetBuilder.build(packetType, sequenceNumber, content)
         self.__socketRC.sendto(packet.getBytes(), self.__routerAddr)
@@ -45,11 +45,10 @@ class ReceiverController:
         self.__socketRC.settimeout(timeout)
         try:
             data, addr = self.__socketRC.recvfrom(PACKET_SIZE)
-        except Exception as e:
-            print(e)
+        except socket.timeout:
             return None
         pkt = Packet.from_bytes(data)
-        print("Got packet type: " + str(pkt.packet_type) + " with #" + str(pkt.seq_num))
+        logging.debug("Got packet type: {} with #{}".format(str(pkt.packet_type),str(pkt.seq_num)))
 
         if (self.__packetBuilder is None):
             self.address = (pkt.getDestinationAddress(), pkt.getDestinationPort())
@@ -58,21 +57,31 @@ class ReceiverController:
         return pkt
 
     def buildConnection(self):
+	"""
+	Three-way handshake
+	"""
+        self.__socketRC = socket(AF_INET, SOCK_DGRAM)
+        self.__socketRC.bind(('', self.__port))
+        logging.info("Server is listening at {}:{}.".format(SERVER_IP, SERVER_PORT))
+
         packet = self.getPacket()
 
         # boolean if connection is built
         # TODO: if pkt type is syn, send ack syn, if already acked, return true
         if (packet.packet_type == PACKET_TYPE_SYN):
             addr = (packet.peer_ip_addr, packet.peer_port)
-            self.sendPacket(PACKET_TYPE_SYN_AK, 1, "")
- 
+            self.sendPacket(PACKET_TYPE_SYN_AK, 0)
+            # we can just ignore the comming ACK, because it could be lost but the sender would not deal with this case
+            # but we do shuld be careful with the first packet when receiving the http request
+            return True
+    '''''
             packet = self.getPacket()
 
             if (packet.packet_type == PACKET_TYPE_AK):
                 windowSize = int(packet.payload.rstrip())
                 self.__window = ReceiverWindow(windowSize, self.sendPacket, self.getPacket)
                 return True
-
+    '''''
         return False
 
     def disConnect(self):
