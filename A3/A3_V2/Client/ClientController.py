@@ -24,6 +24,24 @@ class ClientController:
         if(self.connect()):
             # Second: send message
             window = SenderWindow(message)
+            threading.Thread(target=self.receiveListener, args=(window)).start()
+            while window.hasPendingPacket: # Not all packets have been sent
+                # Get next sendable packets if there is any in WINDOW
+                for frame in window.getFrames():
+                    p = self.__packetBuilder.build(PACKET_TYPE_DATA, frame.index, frame.payload)
+                    self.__conn.sendto(p.to_bytes(), self.__routerAddr)
+                    frame.timer = time.time()
+        else:
+            logging.err("Cannot establish the connection to {}:{}.".format(SERVER_IP, SERVER_PORT))
+    
+    def getReponse(self):
+        """
+        The client invoke this function to get http response
+        """
+        # First: connect
+        if(self.connect()):
+            # Second: send message
+            window = SenderWindow(message)
             # Third: start a thread to receive responses
             threading.Thread(target=self.receiveListener, args=(window)).start()
             while window.hasPendingPacket: # Not all packets have been sent
@@ -33,11 +51,12 @@ class ClientController:
                     self.__conn.sendto(p.to_bytes(), self.__routerAddr)
                     frame.timer = time.time()
                     
-            # Fourth: disconnect
+            # Third: disconnect
             self.disConnect()
         else:
             logging.err("Cannot establish the connection to {}:{}.".format(SERVER_IP, SERVER_PORT))
-        
+
+
     def receiveListener(self, window):
         """
         Listen response from server
