@@ -1,7 +1,7 @@
 from DealPackets.SelectiveRepeatWindow import *
 
 
-class ReceiverWindow():
+class ServerWindow():
 
     def __init__(self):
         # where WINDOW starts from

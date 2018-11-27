@@ -2,12 +2,12 @@ import logging
 import time
 from socket import *
 from DealPackets.Packet import *
-from Sender.SenderWindow import *
 from DealPackets.packetConstructor import *
+from Client.ClientWindow import *
 from const import *
 
 
-class SenderController:
+class ClientController:
     __conn = None
     __routerAddr = None
     __packetBuilder = None

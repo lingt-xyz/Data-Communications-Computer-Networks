@@ -2,7 +2,7 @@ import logging
 from socket import *
 from DealPackets.Packet import *
 from DealPackets.packetConstructor import *
-from Receiver.ReceiverWindow import *
+from Server.ServerWindow import *
 
 
 class ReceiverController:

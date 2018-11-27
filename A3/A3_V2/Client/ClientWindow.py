@@ -15,7 +15,7 @@ class Frame:
         self.timer = 0
         self.frames = []
 
-class SenderWindow():
+class ClientWindow():
     def __init__(self, message):
         # number of packets
         self.numberOfFrames = math.ceil(len(message)/PAYLOAD_SIZE)
