@@ -1,4 +1,4 @@
-from Transport.DealPackets.Packet import *
+from Transport.Packet import *
 
 class PacketConstructor:
         __destinationAddress = None
