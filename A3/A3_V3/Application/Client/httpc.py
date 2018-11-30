@@ -1,7 +1,7 @@
 import socket
 from urllib.parse import urlparse
 import re
-import MockHttpClient
+from Application.Client.MockHttpClient import *
 from Transport.Client.ClientController import *
 
 class Parameter:
@@ -71,20 +71,20 @@ def sendHttpRequest(command):
                     readFileName = command.split(" -f ")[1].split(" ")[0]
                     with open(readFileName, 'r') as f:
                         Parameter.bodyData = f.read()
-                request = MockHttpClient.HttpRequest(host, o.path, Parameter.bodyData, Parameter.headers)
+                request = HttpRequest(host, o.path, Parameter.bodyData, Parameter.headers)
                 #print(request.getPost().decode('utf-8'))
                 data = udpClient.sendMessage(request.getPost())
 
             else:
-                request = MockHttpClient.HttpRequest(host, o.path, o.query, Parameter.headers)
+                request = HttpRequest(host, o.path, o.query, Parameter.headers)
                 #print(request.getGet().decode('utf-8'))
                 data = udpClient.sendMessage(request.getGet())
 
             #data = recvall(s)
                 
-            response = MockHttpClient.HttpResponse(data)
+            response = HttpResponse(data)
 
-            if(response.code == MockHttpClient.HttpCode.redirect):
+            if(response.code == HttpCode.redirect):
                 host = response.location
             else:
                 break

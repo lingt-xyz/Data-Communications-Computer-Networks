@@ -1,4 +1,4 @@
-from httpserver import MockHttpServer
+from Application.Server.httpserver import MockHttpServer
 import sys
 import logging
 import argparse

@@ -8,7 +8,7 @@ from pprint import pprint
 #from MockHttpRequest import MockHttpRequest
 #from MockHttpResponse import MockHttpResponse
 
-from FileManager import FileManager
+from Application.Server.FileManager import FileManager
 from Transport.Server.ServerController import *
 
 class MockHttpServer:
