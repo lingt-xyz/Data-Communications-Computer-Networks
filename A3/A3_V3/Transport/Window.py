@@ -72,10 +72,15 @@ class Window():
         return False
 
     def finished(self):
-	# check payload ###total number###
-	# if is last one, update fini
-	p = self.frames[-1]
-        self.pointer ==
+	    # check payload ###total number###
+	    # if is last one, update fini
+	    p = self.frames[-1]
+        pload = p.payload
+        if ('#' in pload):
+            pload = pload[3,-3]
+            if(self.pointer == pload):
+                self.fini = true
+
         return self.fini
 
     def process(self, p):
