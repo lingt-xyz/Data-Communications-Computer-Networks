@@ -1,5 +1,6 @@
 from Transport.DealPackets.SelectiveRepeatWindow import *
 from Transport.const import *
+from Transport.Client.ClientWindow import Frame
 
 
 class ServerWindow():
