@@ -79,7 +79,7 @@ class Window():
         if ('#' in pload):
             pload = pload[3,-3]
             if(self.pointer == pload):
-                self.fini = true
+                self.fini = True
 
         return self.fini
 
