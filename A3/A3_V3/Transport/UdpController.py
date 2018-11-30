@@ -106,7 +106,9 @@ class ClientController:
 	window = Window()
             while not window.finished():
                 p = self.getPacket()
-                # TODO discard possible packet from handshake
+                # discard possible packet from handshake
+                if(p.packet_type == PACKET_TYPE_AK and p.seq_num == 0):
+                    pass
                 window.process(p)
                 # send ACK
                 p = self.__packetBuilder.build(PACKET_TYPE_AK)
