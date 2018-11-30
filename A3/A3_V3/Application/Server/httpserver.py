@@ -32,7 +32,7 @@ class MockHttpServer:
 		requestParser = HttpRequestParser(data)
 		logging.debug("Received the {0} request.".format(requestParser.method))
 		# pprint(vars(requestParser))
-		response_msg = self.generateResponse(requestParser, dirPath)
+		response_msg = self.generateResponse(requestParser, self.dataDirectory)
 		logging.debug('Response message: {0}.'.format(response_msg))
 		server.sendMessage(response_msg)
 
