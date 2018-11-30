@@ -26,6 +26,16 @@ class MockHttpServer:
 		logging.info("Starting web server...")
 		#listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		server = ServerController()
+		data = server.receiveMessage()
+		logging.debug("Received the data: \r\n{0}".format(data))
+		requestParser = HttpRequestParser(data)
+		logging.debug("Received the {0} request.".format(requestParser.method))
+		# pprint(vars(requestParser))
+		response_msg = self.generateResponse(requestParser, dirPath)
+		logging.debug('Response message: {0}.'.format(response_msg))
+		server.sendMessage(response_msg)
+
+		"""
 		try:
 			listener.bind(('', self.port))
 			listener.listen(5)
@@ -39,9 +49,11 @@ class MockHttpServer:
 			logging.info("Shuting down the server...")
 			listener.close()
 			logging.info('Web server has been shut down at {}.'.format(self.port))
-
+		"""
 	# handle the request from client and return the response to client
 	def handler(self, conn, address, dirPath):
+		server = ServerController()
+		data = server.receiveMessage()
 		try:
 			# convert bytes to string
 			data = self.recvall(conn).decode("utf-8")
