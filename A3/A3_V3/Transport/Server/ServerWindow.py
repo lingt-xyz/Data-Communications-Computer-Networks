@@ -9,6 +9,7 @@ class ServerWindow():
         # where WINDOW starts from
         self.pointer = 0
         # WINDOW frames #TODO what's the size? Should use a list?
+        self.numberOfFrames = 5
         self.frames = []
         self.fini = False
 
