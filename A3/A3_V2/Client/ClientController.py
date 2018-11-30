@@ -86,12 +86,11 @@ class ClientController:
         """
         logging.info("Connecting to {}:{}.".format(SERVER_IP, SERVER_PORT))
         self.__conn = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        timeout = 5
         try:
             # Send SYN
             p = self.__packetBuilder.build(PACKET_TYPE_SYN)
             self.__conn.sendto(p.to_bytes(), self.__routerAddr)
-            self.__conn.settimeout(timeout)
+            self.__conn.settimeout(TIME_OUT)
             logging.debug('Waiting for a response')
             # Expecting SYN_ACK
             response, sender = self.__conn.recvfrom(1024)
