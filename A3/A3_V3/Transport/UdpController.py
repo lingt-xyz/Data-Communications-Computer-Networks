@@ -103,7 +103,7 @@ class UdpController:
                 window.updateWindow([p.seq_num-1])
 
     def receiveMessage(self):
-	window = Window()
+	    window = Window()
             while not window.finished():
                 p = self.getPacket()
                 # discard possible packet from handshake
@@ -113,7 +113,9 @@ class UdpController:
                 # send ACK
                 p = self.__packetBuilder.build(PACKET_TYPE_AK)
                 self.__conn.sendto(p.to_bytes(), self.__routerAddr)
-            return retrieveData(window)
+
+            data = self.retrieveData(window)
+            return data
 
 
     # return data
