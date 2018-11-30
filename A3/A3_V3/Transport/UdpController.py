@@ -113,18 +113,17 @@ class UdpController:
                 # send ACK
                 p = self.__packetBuilder.build(PACKET_TYPE_AK)
                 self.__conn.sendto(p.to_bytes(), self.__routerAddr)
-          #TODO return data  
 
+
+    # return data
     def retrieveData(self,window):
 
         for i in range(self.pointer, self.pointer + WINDOW_SIZE):
             f = window.frames[i]
-            fr = window.getFrames()
+            if not window.finished():
+                data = f.payload
+            return data
 
-            if (f.send and not f.ACK):
-                if (f.timer + TIME_OUT > time.time()):
-                    # reset send status, so it can be re-sent
-                    f.send = False
 
     def getPacket(self):
         self.__conn.settimeout(ALIVE)
