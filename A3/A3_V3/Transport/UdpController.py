@@ -7,7 +7,7 @@ from Transport.const import *
 from Transport.Window import *
 
 
-class ClientController:
+class UdpController:
     __conn = None
     __routerAddr = None
     __packetBuilder = None
@@ -114,6 +114,17 @@ class ClientController:
                 p = self.__packetBuilder.build(PACKET_TYPE_AK)
                 self.__conn.sendto(p.to_bytes(), self.__routerAddr)
           #TODO return data  
+
+    def retrieveData(self,window):
+
+        for i in range(self.pointer, self.pointer + WINDOW_SIZE):
+            f = window.frames[i]
+            fr = window.getFrames()
+
+            if (f.send and not f.ACK):
+                if (f.timer + TIME_OUT > time.time()):
+                    # reset send status, so it can be re-sent
+                    f.send = False
 
     def getPacket(self):
         self.__conn.settimeout(ALIVE)
