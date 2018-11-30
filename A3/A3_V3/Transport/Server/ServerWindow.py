@@ -1,5 +1,5 @@
 from Transport.DealPackets.SelectiveRepeatWindow import *
-import Transport.const
+from Transport.const import *
 
 
 class ServerWindow():
@@ -17,7 +17,7 @@ class ServerWindow():
     def process(self, p):
 	# Is it in WINDOW range?
         index = p.seq_num - 1
-        if self.pointer <= index < self.pointer + const.WINDOW_SIZE:
+        if self.pointer <= index < self.pointer + WINDOW_SIZE:
             # check whether already received
             if self.frames[index] is None:
                 self.frames[index] = p
@@ -37,7 +37,7 @@ class ServerWindow():
 	if last:
             self.fini = True
 	else:
-            for i in range(self.pointer, self.pointer + const.WINDOW_SIZE):
+            for i in range(self.pointer, self.pointer + WINDOW_SIZE):
                 # TODO check indexOutOfBoundException
                 if(self.frames[i] is not None):
                     offset+=1

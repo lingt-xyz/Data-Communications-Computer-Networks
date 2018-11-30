@@ -4,7 +4,7 @@ from Transport.DealPackets.Packet import *
 from Transport.DealPackets.packetConstructor import *
 from Transport.Server.ServerWindow import *
 from Transport.Client.ClientWindow import *
-import Transport.const
+from Transport.const import *
 
 
 class ReceiverController:
@@ -13,7 +13,7 @@ class ReceiverController:
     __packetBuilder = None
 
     def __init__(self):
-        self.__routerAddr = (const.ROUTER_IP,const.ROUTER_PORT)
+        self.__routerAddr = (ROUTER_IP,ROUTER_PORT)
 
     def receiveMessage(self):
         """
@@ -65,8 +65,8 @@ class ReceiverController:
 	Three-way handshake
 	"""
         self.__socketRC = socket(AF_INET, SOCK_DGRAM)
-        self.__socketRC.bind(('', const.SERVER_PORT))
-        logging.info("Server is listening at {}:{}.".format(const.SERVER_IP, const.SERVER_PORT))
+        self.__socketRC.bind(('', SERVER_PORT))
+        logging.info("Server is listening at {}:{}.".format(SERVER_IP, SERVER_PORT))
 
         packet = self.getPacket()
 
