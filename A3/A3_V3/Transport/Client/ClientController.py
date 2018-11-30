@@ -1,11 +1,11 @@
 import logging
 import time
 from socket import *
-from DealPackets.Packet import *
-from DealPackets.packetConstructor import *
-from Client.ClientWindow import *
-from DealPackets.SelectiveRepeatWindow import *
-from const import *
+from Transport.DealPackets.Packet import *
+from Transport.DealPackets.packetConstructor import *
+from Transport.Client.ClientWindow import *
+from Transport.DealPackets.SelectiveRepeatWindow import *
+from Transport.const import *
 
 
 class ClientController:

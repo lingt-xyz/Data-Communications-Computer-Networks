@@ -1,7 +1,7 @@
 import time
 import threading
 import math
-from DealPackets.Packet import *
+from Transport.DealPackets.Packet import *
 
 DEFAULT_WAIT_TIME = 10
 

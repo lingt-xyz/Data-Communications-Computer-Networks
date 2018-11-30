@@ -1,10 +1,10 @@
 import logging
 from socket import *
-from DealPackets.Packet import *
-from DealPackets.packetConstructor import *
-from Server.ServerWindow import *
-from Client.ClientWindow import *
-import const
+from Transport.DealPackets.Packet import *
+from Transport.DealPackets.packetConstructor import *
+from Transport.Server.ServerWindow import *
+from Transport.Client.ClientWindow import *
+import Transport.const
 
 
 class ReceiverController:

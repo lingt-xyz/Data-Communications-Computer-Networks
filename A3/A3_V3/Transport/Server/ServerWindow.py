@@ -1,5 +1,5 @@
-from DealPackets.SelectiveRepeatWindow import *
-import const
+from Transport.DealPackets.SelectiveRepeatWindow import *
+import Transport.const
 
 
 class ServerWindow():

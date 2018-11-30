@@ -1,9 +1,9 @@
 import time
 import threading
 import math
-from DealPackets.SelectiveRepeatWindow import *
-from DealPackets.Packet import *
-from const import *
+from Transport.DealPackets.SelectiveRepeatWindow import *
+from Transport.DealPackets.Packet import *
+from Transport.const import *
 
 class Frame:
     def __init__(self, index, payload = None):
