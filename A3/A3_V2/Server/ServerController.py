@@ -25,10 +25,13 @@ class ReceiverController:
             # Second, receive request
             window = ServerWindow()
             while not window.finished():
+
                 p = self.getPacket()
                 # TODO discard possible packet from handshake
                 window.process(p)
                 # TODO send ACK
+                self.sendPacket(PACKET_TYPE_AK, self.__window.windowSize, "")
+                self.__socketRC.close()
 
             # Third, response
 
