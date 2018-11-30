@@ -3,6 +3,7 @@ from socket import *
 from DealPackets.Packet import *
 from DealPackets.packetConstructor import *
 from Server.ServerWindow import *
+from Client.ClientWindow import *
 import const
 
 
@@ -30,7 +31,8 @@ class ReceiverController:
                 # TODO discard possible packet from handshake
                 window.process(p)
                 # TODO send ACK
-                self.sendPacket(PACKET_TYPE_AK, self.__window.windowSize, "")
+                p = self.__packetBuilder.build(PACKET_TYPE_AK)
+                self.__conn.sendto(p.to_bytes(), self.__routerAddr)
                 self.__socketRC.close()
 
             # Third, response
