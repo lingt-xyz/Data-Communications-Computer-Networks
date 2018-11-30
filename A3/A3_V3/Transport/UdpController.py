@@ -113,6 +113,7 @@ class UdpController:
                 # send ACK
                 p = self.__packetBuilder.build(PACKET_TYPE_AK)
                 self.__conn.sendto(p.to_bytes(), self.__routerAddr)
+            return retrieveData(window)
 
 
     # return data
