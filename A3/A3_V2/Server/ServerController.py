@@ -23,7 +23,7 @@ class ReceiverController:
         if (self.buildConnection()):
 
             # Second, receive request
-            window = ReceiverWindow()
+            window = ServerWindow()
             while not window.finished():
                 p = self.getPacket()
                 # TODO discard possible packet from handshake

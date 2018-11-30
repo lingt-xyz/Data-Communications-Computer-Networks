@@ -24,7 +24,7 @@ class ClientController:
         # First: connect
         if(self.connect()):
             # Second: send message
-            window = SenderWindow(message)
+            window = ClientWindow(message)
             threading.Thread(target=self.receiveListener, args=(window)).start()
             while window.hasPendingPacket: # Not all packets have been sent
                 # Get next sendable packets if there is any in WINDOW
@@ -42,7 +42,7 @@ class ClientController:
         # First: connect
         if(self.connect()):
             # Second: send message
-            window = SenderWindow(message)
+            window = ClientWindow(message)
             # Third: start a thread to receive responses
             threading.Thread(target=self.receiveListener, args=(window)).start()
             while window.hasPendingPacket: # Not all packets have been sent
