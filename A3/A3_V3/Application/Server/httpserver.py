@@ -25,7 +25,8 @@ class MockHttpServer:
 	def start(self):
 		logging.info("Starting web server...")
 		#listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		server = ServerController()
+		server = UdpController()
+		server.connectClient()
 		data = server.receiveMessage()
 		logging.debug("Received the data: \r\n{0}".format(data))
 		requestParser = HttpRequestParser(data)
@@ -34,54 +35,6 @@ class MockHttpServer:
 		response_msg = self.generateResponse(requestParser, dirPath)
 		logging.debug('Response message: {0}.'.format(response_msg))
 		server.sendMessage(response_msg)
-
-		"""
-		try:
-			listener.bind(('', self.port))
-			listener.listen(5)
-			logging.info('Web server is listening at {}.'.format(self.port))
-			while True:
-				(conn, address) = listener.accept()
-				logging.debug("Received a connection from {0}.".format(address))
-				threading.Thread(target=self.handler, args=(conn, address, self.dataDirectory)).start()
-
-		finally:
-			logging.info("Shuting down the server...")
-			listener.close()
-			logging.info('Web server has been shut down at {}.'.format(self.port))
-		"""
-	# handle the request from client and return the response to client
-	def handler(self, conn, address, dirPath):
-		server = ServerController()
-		data = server.receiveMessage()
-		try:
-			# convert bytes to string
-			data = self.recvall(conn).decode("utf-8")
-			logging.debug("Received the data: \r\n{0}".format(data))
-			requestParser = HttpRequestParser(data)
-			logging.debug("Received the {0} request.".format(requestParser.method))
-			# pprint(vars(requestParser))
-			response_msg = self.generateResponse(requestParser, dirPath)
-			logging.debug('Response message: {0}.'.format(response_msg))
-			conn.send(response_msg)
-			#conn.send('HTTP/1.1 200 OK\r\n\r\nsomething'.encode("utf-8"))
-			conn.close()
-		except IOError as e:
-			logging.err(e)
-		finally:
-			conn.close()
-			logging.debug("Disconnected from {0}.".format(address))
-
-	# read all content from client
-	def recvall(self, conn):
-		data = b''
-		while True:
-			part = conn.recv(self.BUFFER_SIZE)
-			data += part
-			if len(part) < self.BUFFER_SIZE:
-				# either 0 or end of data
-				break
-		return data
 
 	# deal the file request, generate response bytes string, according to HTTP standards.
 	def generateResponse(self, requestParser, dirPath):
@@ -229,8 +182,6 @@ class HttpRequestParser:
 		self.version = version
 		self.contentDisposition = None # TODO
 		self.overwrite = False # TODO
-
-
 
 
 

@@ -2,7 +2,7 @@ import socket
 from urllib.parse import urlparse
 import re
 from Application.Client.MockHttpClient import *
-from Transport.Client.ClientController import *
+from Transport.UdpController import *
 
 class Parameter:
     url = None
@@ -61,8 +61,8 @@ def sendHttpRequest(command):
         else:
             port = o.port
         while(True):
-            udpClient = ClientController()
-
+            udpClient = UdpController()
+            udpClient.connectServer()
             if(command.startswith("post")):
                 if ("-d" in command and "-f" not in command):
                     infos = command.split(" -d ")[1].split(" ")
@@ -73,14 +73,14 @@ def sendHttpRequest(command):
                         Parameter.bodyData = f.read()
                 request = HttpRequest(host, o.path, Parameter.bodyData, Parameter.headers)
                 #print(request.getPost().decode('utf-8'))
-                data = udpClient.sendMessage(request.getPost())
+                udpClient.sendMessage(request.getPost())
 
             else:
                 request = HttpRequest(host, o.path, o.query, Parameter.headers)
                 #print(request.getGet().decode('utf-8'))
-                data = udpClient.sendMessage(request.getGet())
-
+                udpClient.sendMessage(request.getGet())
             #data = recvall(s)
+            data = udpClient.receiveMessage()
                 
             response = HttpResponse(data)
 
