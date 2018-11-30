@@ -4,6 +4,7 @@ from socket import *
 from Transport.Packet import *
 from Transport.packetConstructor import *
 from Transport.const import *
+from Transport.Window import *
 
 
 class ClientController:
@@ -94,7 +95,7 @@ class ClientController:
                         f.send = False
             
             # update ACK
-            response, sender = self.__conn.recvfrom(PACKET_SIZE) # TODO what if packet size is less than PACKET_SIZE?
+            response, sender = self.__conn.recvfrom(PACKET_SIZE)
             p = Packet.from_bytes(response)
             logging.debug('Payload: {}'.format(p.payload.decode("utf-8")))
 

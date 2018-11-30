@@ -75,7 +75,7 @@ class Window():
 	# check payload ###total number###
 	# if is last one, update fini
 	p = self.frames[-1]
-        self.pointer == 
+        self.pointer ==
         return self.fini
 
     def process(self, p):
