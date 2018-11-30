@@ -5,15 +5,15 @@ from DealPackets.SelectiveRepeatWindow import *
 from DealPackets.Packet import *
 from const import *
 
-#TODO: ? still think that should put Frame and window identities into SRW, inheritance
 class Frame:
     def __init__(self, index, payload = None):
+        # sequence number
         self.index = index
+        # data
         self.payload = payload
         self.send = False
         self.ACK = False
         self.timer = 0
-        self.frames = []
 
 class ClientWindow():
     def __init__(self, message):
@@ -21,6 +21,8 @@ class ClientWindow():
         self.numberOfFrames = math.ceil(len(message)/PAYLOAD_SIZE)
         # where WINDOW starts from
         self.pointer = 0
+        # data
+        self.frames = []
         # init all packets
         for i in range(0, self.numberOfFrames):
             self.frames[i] = Frame(i+1, message[i * PAYLOAD_SIZE:(i + 1) * PAYLOAD_SIZE])
@@ -31,7 +33,8 @@ class ClientWindow():
         """
         frameList = []
         for i in range(self.pointer, self.pointer + WINDOW_SIZE):
-            # TODO check indexOutOfBoundException
+            if(self.pointer + WINDOW_SIZE >= len(self.frames)):
+                break
             f = self.frames[i]
             if(not f.send):
                 f.send = True
@@ -45,7 +48,8 @@ class ClientWindow():
         self.frames[index].ACK = True
         offset = 0
         for i in range(self.pointer, self.pointer + WINDOW_SIZE):
-            # TODO check indexOutOfBoundException
+            if(self.pointer + WINDOW_SIZE >= len(self.frames)):
+                break
             if(self.frames[i].ACK):
                 offset+=1
             else:
