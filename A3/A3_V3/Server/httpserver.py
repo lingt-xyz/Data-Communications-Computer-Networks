@@ -9,6 +9,7 @@ from pprint import pprint
 #from MockHttpResponse import MockHttpResponse
 
 from FileManager import FileManager
+from Transport.Server.ServerController import *
 
 class MockHttpServer:
 
@@ -23,7 +24,8 @@ class MockHttpServer:
 	# start the server and dispatch new connection to a thread to handle the communication between client and server
 	def start(self):
 		logging.info("Starting web server...")
-		listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		#listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		server = ServerController()
 		try:
 			listener.bind(('', self.port))
 			listener.listen(5)

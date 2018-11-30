@@ -2,6 +2,7 @@ import socket
 from urllib.parse import urlparse
 import re
 import MockHttpClient
+from Transport.Client.ClientController import *
 
 class Parameter:
     url = None
@@ -60,26 +61,27 @@ def sendHttpRequest(command):
         else:
             port = o.port
         while(True):
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.connect((host, port))
+            udpClient = ClientController()
 
-                if(command.startswith("post")):
-                    if ("-d" in command and "-f" not in command):
-                        infos = command.split(" -d ")[1].split(" ")
-                        Parameter.bodyData = (infos[0] + infos[1])[1:-1]
-                    if ("-f" in command and "-d" not in command):
-                        readFileName = command.split(" -f ")[1].split(" ")[0]
-                        with open(readFileName, 'r') as f:
-                            Parameter.bodyData = f.read()
-                    request = MockHttpClient.HttpRequest(host, o.path, Parameter.bodyData, Parameter.headers)
-                    #print(request.getPost().decode('utf-8'))
-                    s.sendall(request.getPost())
+            if(command.startswith("post")):
+                if ("-d" in command and "-f" not in command):
+                    infos = command.split(" -d ")[1].split(" ")
+                    Parameter.bodyData = (infos[0] + infos[1])[1:-1]
+                if ("-f" in command and "-d" not in command):
+                    readFileName = command.split(" -f ")[1].split(" ")[0]
+                    with open(readFileName, 'r') as f:
+                        Parameter.bodyData = f.read()
+                request = MockHttpClient.HttpRequest(host, o.path, Parameter.bodyData, Parameter.headers)
+                #print(request.getPost().decode('utf-8'))
+                data = udpClient.sendMessage(request.getPost())
 
-                else:
-                    request = MockHttpClient.HttpRequest(host, o.path, o.query, Parameter.headers)
-                    #print(request.getGet().decode('utf-8'))
-                    s.sendall(request.getGet())
-                data = recvall(s)
+            else:
+                request = MockHttpClient.HttpRequest(host, o.path, o.query, Parameter.headers)
+                #print(request.getGet().decode('utf-8'))
+                data = udpClient.sendMessage(request.getGet())
+
+            #data = recvall(s)
+                
             response = MockHttpClient.HttpResponse(data)
 
             if(response.code == MockHttpClient.HttpCode.redirect):
