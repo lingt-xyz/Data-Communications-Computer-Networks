@@ -14,7 +14,7 @@ class Frame:
         self.is_last = is_last
         self.send = False
         self.ACK = False
-        self.timer = 0
+        self.timer = time.time()
 
 
 class Window:

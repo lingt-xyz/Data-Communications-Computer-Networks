@@ -28,7 +28,7 @@ class UdpController:
             # Send SYN
             p = self.__packetBuilder.build(PACKET_TYPE_SYN)
             self.__conn.sendto(p.to_bytes(), self.__routerAddr)
-            self.__conn.settimeout(TIME_OUT)
+            self.__conn.settimeout(ALIVE)
             logging.debug('Waiting for a response')
             # Expecting SYN_ACK
             response, sender = self.__conn.recvfrom(PACKET_SIZE)
@@ -36,7 +36,7 @@ class UdpController:
             logging.debug("Payload: {}".format(p.payload.decode("utf-8")))
             logging.info("Server connection established.")
         except socket.timeout:
-            logging.err("No response after {}s".format(TIME_OUT))
+            logging.err("No response after {}s".format(ALIVE))
             self.__conn.close()
             return False
         if p.packet_type == PACKET_TYPE_SYN_AK:
@@ -97,7 +97,7 @@ class UdpController:
                     break
                 f = window.frames[i]
                 if f.send and not f.ACK:
-                    if f.timer + TIME_OUT > time.time():
+                    if f.timer + TIME_OUT < time.time():
                         # reset send status, so it can be re-sent
                         f.send = False
 
