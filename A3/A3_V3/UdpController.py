@@ -33,7 +33,6 @@ class UdpController:
             # Expecting SYN_ACK
             response, sender = self.__conn.recvfrom(PACKET_SIZE)
             p = Packet.from_bytes(response)
-            logging.debug("Payload: {}".format(p.payload.decode("utf-8")))
             logging.info("Server connection established.")
         except socket.timeout:
             logging.err("No response after {}s".format(ALIVE))
@@ -82,7 +81,7 @@ class UdpController:
             for frame in window.getFrames():
                 p = self.__packetBuilder.build(PACKET_TYPE_DATA, frame.seq_num, frame.payload)
                 self.__conn.sendto(p.to_bytes(), self.__routerAddr)
-                print("--------------->Send: {}".format(p.payload))
+                logging.debug("--------------->Send Message: {}".format(p.payload))
                 frame.timer = time.time()
 
     def senderListener(self, window):
@@ -100,12 +99,12 @@ class UdpController:
                     if f.timer + TIME_OUT < time.time():
                         # reset send status, so it can be re-sent
                         f.send = False
-
+                        logging.debug("--------------->Time out: {}".format(f.seq_num))
             # update ACK
             response, sender = self.__conn.recvfrom(PACKET_SIZE)
 
             p = Packet.from_bytes(response)
-            logging.debug('Payload: {}'.format(p.payload.decode("utf-8")))
+            logging.debug('Received response: {}: {}'.format(p, p.payload.decode("utf-8")))
 
             if p.packet_type == PACKET_TYPE_AK:
                 window.updateWindow(p.seq_num)
@@ -116,7 +115,6 @@ class UdpController:
         while not window.finished():
             # TODO if None, raise error
             p = self.getPacket()
-            print("--------------->Received: {}".format(p.payload))
             # discard possible packet from handshake
             if p.packet_type == PACKET_TYPE_AK and p.seq_num == 0:
                 continue
@@ -140,6 +138,7 @@ class UdpController:
         try:
             data, addr = self.__conn.recvfrom(PACKET_SIZE)
             pkt = Packet.from_bytes(data)
+            logging.debug("--------------->Received: {}:{}".format(pkt,pkt.payload))
             self.__routerAddr = addr
 
             if self.__packetBuilder is None:

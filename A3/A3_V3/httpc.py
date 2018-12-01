@@ -3,6 +3,9 @@ from urllib.parse import urlparse
 import re
 from MockHttpClient import *
 from UdpController import *
+import logging
+import sys
+
 
 class Parameter:
     url = None
@@ -42,6 +45,10 @@ def sendHttpRequest(command):
         command = command.split(" -o ")[0]
     if ("-v" in command):
         Parameter.verbose = True
+        # whether output debug
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+    #else:
+    #    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     if ("-h" in command):
         Parameter.headers = getHeaders(command)
 
@@ -81,7 +88,7 @@ def sendHttpRequest(command):
             data = udpClient.receiveMessage()
                 
             response = HttpResponse(data)
-
+            logging.debug("---------------->Client received response: {}".format(response))
             if(response.code == HttpCode.redirect):
                 host = response.location
             else:

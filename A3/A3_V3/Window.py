@@ -3,6 +3,7 @@ import threading
 import math
 from Packet import *
 from const import *
+import logging
 
 
 class Frame:
@@ -14,7 +15,7 @@ class Frame:
         self.is_last = is_last
         self.send = False
         self.ACK = False
-        self.timer = time.time()
+        self.timer = 0
 
 
 class Window:
@@ -72,6 +73,10 @@ class Window:
         """
         Check whether all packets have been ACKed
         """
+        logging.debug("---------------->Number of frames: {}".format(self.numberOfFrames))
+        for i in range(0, self.numberOfFrames):
+            logging.debug("---------------->Check frames: {}".format(self.frames[i].ACK))
+
         for i in range(0, self.numberOfFrames):
             if not self.frames[i].ACK:
                 return True
