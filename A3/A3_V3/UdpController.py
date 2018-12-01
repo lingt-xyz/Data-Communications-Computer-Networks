@@ -82,6 +82,7 @@ class UdpController:
             for frame in window.getFrames():
                 p = self.__packetBuilder.build(PACKET_TYPE_DATA, frame.seq_num, frame.payload)
                 self.__conn.sendto(p.to_bytes(), self.__routerAddr)
+                print("--------------->Send: {}".format(p.payload))
                 frame.timer = time.time()
 
     def senderListener(self, window):
@@ -104,7 +105,6 @@ class UdpController:
             response, sender = self.__conn.recvfrom(PACKET_SIZE)
 
             p = Packet.from_bytes(response)
-            print("receive: {}".format(p))
             logging.debug('Payload: {}'.format(p.payload.decode("utf-8")))
 
             if p.packet_type == PACKET_TYPE_AK:
@@ -116,6 +116,7 @@ class UdpController:
         while not window.finished():
             # TODO if None, raise error
             p = self.getPacket()
+            print("--------------->Received: {}".format(p.payload))
             # discard possible packet from handshake
             if p.packet_type == PACKET_TYPE_AK and p.seq_num == 0:
                 continue

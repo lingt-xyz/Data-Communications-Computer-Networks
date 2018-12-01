@@ -78,7 +78,6 @@ def sendHttpRequest(command):
             else:
                 request = HttpRequest(host, o.path, o.query, Parameter.headers)
                 udpClient.sendMessage(request.getGet())
-            #data = recvall(s)
             data = udpClient.receiveMessage()
                 
             response = HttpResponse(data)
