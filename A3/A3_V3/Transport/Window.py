@@ -1,8 +1,8 @@
 import time
 import threading
 import math
-from Transport.Packet import *
-from Transport.const import *
+from Packet import *
+from const import *
 
 class Frame:
     def __init__(self, index, payload = None):
@@ -23,7 +23,7 @@ class Window():
 
     def createSenderWindow(self, message):
         # number of packets
-	self.numberOfPayload = math.ceil(len(message)/PAYLOAD_SIZE) 
+        self.numberOfPayload = math.ceil(len(message)/PAYLOAD_SIZE) 
         self.numberOfFrames = self.numberOfPayload + 1
         # init all packets
         for i in range(0, self.numberOfPayload):
@@ -31,7 +31,7 @@ class Window():
         self.frames[-1] = Frame(self.numberOfFrames-1, "###"+self.numberOfPayload+"###")
 
     def createReceiverWindow(self):
-	pass
+        pass
 
     def getFrames(self):
         """
@@ -72,9 +72,9 @@ class Window():
         return False
 
     def finished(self):
-	    # check payload ###total number###
-	    # if is last one, update fini
-	    p = self.frames[-1]
+        # check payload ###total number###
+        # if is last one, update fini
+        p = self.frames[-1]
         pload = p.payload
         if ('#' in pload):
             pload = pload[3,-3]

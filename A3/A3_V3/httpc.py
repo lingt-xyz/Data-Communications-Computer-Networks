@@ -1,9 +1,10 @@
 import socket
 from urllib.parse import urlparse
 import re
-from Application.Client.MockHttpClient import *
+from MockHttpClient import *
+import sys
+print(sys.path)
 from Transport.UdpController import *
-
 class Parameter:
     url = None
     verbose = False

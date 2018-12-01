@@ -8,8 +8,8 @@ from pprint import pprint
 #from MockHttpRequest import MockHttpRequest
 #from MockHttpResponse import MockHttpResponse
 
-from Application.Server.FileManager import FileManager
-from Transport.Server.ServerController import *
+from FileManager import FileManager
+from Transport.UdpController import *
 
 class MockHttpServer:
 

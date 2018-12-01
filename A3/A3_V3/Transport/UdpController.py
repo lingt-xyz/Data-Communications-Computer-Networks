@@ -1,10 +1,10 @@
 import logging
 import time
 from socket import *
-from Transport.Packet import *
-from Transport.packetConstructor import *
-from Transport.const import *
-from Transport.Window import *
+from Packet import *
+from packetConstructor import *
+from const import *
+from Window import *
 
 
 class UdpController:
@@ -50,9 +50,9 @@ class UdpController:
             return False
 
     def connectClient(self):
-	"""
-	Three-way handshake
-	"""
+        """
+        Three-way handshake
+        """
         self.__routerAddr = (ROUTER_IP,ROUTER_PORT)
         self.__conn = socket(AF_INET, SOCK_DGRAM)
         self.__conn.bind(('', SERVER_PORT))
@@ -74,11 +74,11 @@ class UdpController:
 	    window = Window(message)
 	    threading.Thread(target=self.senderListener, args=(window)).start()
 	    while window.hasPendingPacket: # Not all packets have been sent
-		# Get next sendable packets if there is any in WINDOW
-		for frame in window.getFrames():
-		    p = self.__packetBuilder.build(PACKET_TYPE_DATA, frame.index, frame.payload)
-		    self.__conn.sendto(p.to_bytes(), self.__routerAddr)
-		    frame.timer = time.time()
+                # Get next sendable packets if there is any in WINDOW
+                for frame in window.getFrames():
+                    p = self.__packetBuilder.build(PACKET_TYPE_DATA, frame.index, frame.payload)
+                    self.__conn.sendto(p.to_bytes(), self.__routerAddr)
+                    frame.timer = time.time()
 
     def senderListener(self, window):
         """
@@ -104,7 +104,7 @@ class UdpController:
 
     def receiveMessage(self):
 	    window = Window()
-            while not window.finished():
+	    while not window.finished():
                 p = self.getPacket()
                 # discard possible packet from handshake
                 if(p.packet_type == PACKET_TYPE_AK and p.seq_num == 0):
@@ -114,8 +114,8 @@ class UdpController:
                 p = self.__packetBuilder.build(PACKET_TYPE_AK)
                 self.__conn.sendto(p.to_bytes(), self.__routerAddr)
 
-            data = self.retrieveData(window)
-            return data
+	    data = self.retrieveData(window)
+	    return data
 
 
     # return data
