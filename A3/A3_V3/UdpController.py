@@ -5,6 +5,7 @@ from Packet import *
 from packetConstructor import *
 from const import *
 from Window import *
+import sys
 
 
 class UdpController:
@@ -35,9 +36,9 @@ class UdpController:
             p = Packet.from_bytes(response)
             logging.info("[Transport] Server connection established.")
         except socket.timeout:
-            logging.err("[Transport] No response after {}s".format(ALIVE))
+            print("[Transport] Connecting timeout.")
             self.__conn.close()
-            return False
+            sys.exit(0)
         if p.packet_type == PACKET_TYPE_SYN_AK:
             # Send ACK
             p = self.__packetBuilder.build(PACKET_TYPE_AK)
@@ -45,9 +46,9 @@ class UdpController:
             # No need to timeout, we know server is ready
             return True
         else:
-            logging.err("[Transport] Unexpected packet: {}".format(p))
+            print("[Transport] Unexpected packet: {}".format(p))
             self.__conn.close()
-            return False
+            sys.exit(0)
 
     def connectClient(self):
         """
@@ -58,8 +59,11 @@ class UdpController:
         self.__conn.bind(('', SERVER_PORT))
         logging.info("[Transport] Server is listening at {}:{}.".format(SERVER_IP, SERVER_PORT))
 
-        packet = self.getPacket()
-        # boolean if connection is built
+        packet = self.getPacket(ALIVE)
+        if packet is None:
+            print("[Transport] Connecting timeout.")
+            # TODO confirm timeout
+            return False
         # if pkt type is syn, send ack syn, if already acked, return true
         if packet.packet_type == PACKET_TYPE_SYN:
             # addr = (packet.peer_ip_addr, packet.peer_port)
@@ -91,25 +95,24 @@ class UdpController:
         """
         while window.hasPendingPacket():
             # Find packets that have been sent but have not been ACKed
-            logging.debug('[Transport] Found pending packets have not been ACKed, check timeout.')
             # Then, check their timer
-            for i in range(window.pointer, window.pointer + WINDOW_SIZE):
-                if i >= len(window.frames):
-                    break
-                f = window.frames[i]
-                if f.send and not f.ACK:
-                    if f.timer + TIME_OUT < time.time():
+            try:
+                self.__conn.settimeout(TIME_OUT)
+                response, sender = self.__conn.recvfrom(PACKET_SIZE)
+                p = Packet.from_bytes(response)
+                logging.debug('[Transport] Received response: {}: {}'.format(p, p.payload.decode("utf-8")))
+                if p.packet_type == PACKET_TYPE_AK:
+                    window.updateWindow(p.seq_num)
+            except socket.timeout:
+                logging.debug("[Transport] Timeout when wait ACK.")
+                for i in range(window.pointer, window.pointer + WINDOW_SIZE):
+                    if i >= len(window.frames):
+                        break
+                    f = window.frames[i]
+                    if f.send and not f.ACK:
                         # reset send status, so it can be re-sent
                         f.send = False
-                        logging.debug("[Transport] Time out: {}: sent at {}, now is {}".format(f.seq_num, f.timer, time.time()))
-            # update ACK
-            response, sender = self.__conn.recvfrom(PACKET_SIZE)
 
-            p = Packet.from_bytes(response)
-            logging.debug('[Transport] Received response: {}: {}'.format(p, p.payload.decode("utf-8")))
-
-            if p.packet_type == PACKET_TYPE_AK:
-                window.updateWindow(p.seq_num)
         logging.debug('[Transport] Listener reaches the end!')
 
     def receiveMessage(self):
@@ -117,7 +120,10 @@ class UdpController:
         window.createReceiverWindow()
         while not window.finished():
             # TODO if None, raise error
-            p = self.getPacket()
+            p = self.getPacket(TIME_OUT_FOR_RECEIVE)
+            if p is None:
+                logging.debug("[Transport] No message received in timeout time")
+                return None
             # discard possible packet from handshake
             if p.packet_type == PACKET_TYPE_AK and p.seq_num == 0:
                 continue
@@ -136,8 +142,8 @@ class UdpController:
             data = data + f.payload
         return data
 
-    def getPacket(self):
-        self.__conn.settimeout(ALIVE)
+    def getPacket(self, timeout):
+        self.__conn.settimeout(timeout)
         try:
             data, addr = self.__conn.recvfrom(PACKET_SIZE)
             pkt = Packet.from_bytes(data)
@@ -149,9 +155,10 @@ class UdpController:
 
             return pkt
         except socket.timeout:
+            logging.debug('[Transport] Time out when recvfrom message!')
             return None
 
-    def disConnect(self):
+    def dis_connect(self):
         """
         Disconnecting: FIN, ACK, FIN, ACK
         """

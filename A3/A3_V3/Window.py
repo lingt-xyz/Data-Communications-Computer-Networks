@@ -67,15 +67,11 @@ class Window:
             else:
                 break
         self.pointer += offset
-        for i in range(0, self.numberOfFrames):
-            logging.debug("Check WINDOW frames is ACK {}".format(self.frames[i].ACK))
 
     def hasPendingPacket(self):
         """
         Check whether all packets have been ACKed
         """
-        for i in range(0, self.numberOfFrames):
-            logging.debug("Packet sent: is ACK {}".format(self.frames[i].ACK))
         for i in range(0, self.numberOfFrames):
             if not self.frames[i].ACK:
                 return True

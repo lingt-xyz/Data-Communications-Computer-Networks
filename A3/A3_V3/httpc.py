@@ -85,13 +85,18 @@ def sendHttpRequest(command):
                 logging.debug("[Application] Client sent request: {}".format(request.getGet()))
                 udpClient.sendMessage(request.getGet())
             data = udpClient.receiveMessage()
-            logging.debug("[Application] Client received response: {}".format(data.encode('utf-8')))
+            if data is None:
+                logging.debug("[Application] Client did not receive response.")
+                sys.exit(0)
+            logging.debug("[Application] Client received response: {}".format(data.decode('utf-8')))
                 
             response = HttpResponse(data)
             if(response.code == HttpCode.redirect):
                 host = response.location
             else:
                 break
+
+        udpClient.dis_connect()
 
         if Parameter.verbose:
             print(response.text)
