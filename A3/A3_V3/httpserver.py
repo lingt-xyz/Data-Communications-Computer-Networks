@@ -11,10 +11,10 @@ from pprint import pprint
 from FileManager import FileManager
 from UdpController import *
 
+
 class MockHttpServer:
 
-	BUFFER_SIZE = 1024 # 1 KiB
-	#HOST = 'localhost'
+	BUFFER_SIZE = 1024  # 1 KiB
 
 	# initialized port and data directory
 	def __init__(self, port=8080, d="."):
@@ -24,19 +24,15 @@ class MockHttpServer:
 	# start the server and dispatch new connection to a thread to handle the communication between client and server
 	def start(self):
 		logging.info("Starting web server...")
-		#listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		server = UdpController()
 		server.connectClient()
 		data = server.receiveMessage()
-		print(data)
 		logging.debug("Received the data: \r\n{0}".format(data))
 		requestParser = HttpRequestParser(data)
 		logging.debug("Received the {0} request.".format(requestParser.method))
-		# pprint(vars(requestParser))
 		response_msg = self.generateResponse(requestParser, self.dataDirectory)
 		logging.debug('Response message: {0}.'.format(response_msg))
 		server.sendMessage(response_msg)
-		print(response_msg)
 
 	# deal the file request, generate response bytes string, according to HTTP standards.
 	def generateResponse(self, requestParser, dirPath):
