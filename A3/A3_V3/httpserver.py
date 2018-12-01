@@ -10,6 +10,7 @@ from pprint import pprint
 
 from FileManager import FileManager
 from UdpController import *
+from const import *
 
 
 class MockHttpServer:
@@ -24,8 +25,20 @@ class MockHttpServer:
 	# start the server and dispatch new connection to a thread to handle the communication between client and server
 	def start(self):
 		logging.info("[Application] Starting web server...")
+		self.serving()
+		"""
 		while(True):
+		try:
+			self.__conn.settimeout(LISTENER)
+			response, sender = self.__conn.recvfrom(PACKET_SIZE)
+			p = Packet.from_bytes(response)
+			p.peer_ip_addr = peer_ip_addr
+			p.peer_port = int(peer_port)
+			logging.debug('[Transport] Received response: {}: {}'.format(p, p.payload.decode("utf-8")))
 			self.serving()
+		except socket.timeout:
+			pass
+		"""
 
 	def serving(self):
 		server = UdpController()
