@@ -42,7 +42,8 @@
 
 ### Test cases
 ```
-router --port=3000 --drop-rate=0.2 --max-delay=10ms --seed=1
+./router_x64 --port=3000 --drop-rate=0.2 --max-delay=10ms --seed=1
+./router_x64 --port=3000 --max-delay=10ms --seed=1
 
 python3 httpc.py -v
 get 'http://localhost:8080/'
