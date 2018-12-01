@@ -8,5 +8,5 @@ class PacketConstructor:
                 self.__destinationAddress = destinationAddress
                 self.__destinationPort = destinationPort
 
-        def build(self, packetType, sequenceNumber = 0, payload = None):
-                return Packet(packetType, sequenceNumber, self.__destinationAddress, self.__destinationPort, payload)
+        def build(self, packetType, sequenceNumber = 0, payload = "", islast = False):
+                return Packet(packetType, sequenceNumber, self.__destinationAddress, self.__destinationPort, islast, payload)

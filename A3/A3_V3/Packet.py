@@ -1,7 +1,5 @@
 import ipaddress
 
-MIN_LEN = 11
-MAX_LEN = 1024
 
 PACKET_TYPE_NONE = 0
 PACKET_TYPE_DATA = 1
@@ -23,6 +21,9 @@ class Packet:
     """
     Packet represents a simulated UDP packet.
     """
+
+    MIN_LEN = 12
+    MAX_LEN = 1024
 
     def __init__(self, packet_type, seq_num, peer_ip_addr, peer_port, is_last_packet, payload):
         self.packet_type = int(packet_type)
@@ -51,7 +52,7 @@ class Packet:
         return buf
 
     def __repr__(self, *args, **kwargs):
-        return "#%d, peer=%s:%s, size=%d" % (self.seq_num, self.peer_ip_addr, self.peer_port, len(self.payload))
+        return "#type=%d, seq_num=%d, peer=%s:%s, size=%d" % (self.packet_type, self.seq_num, self.peer_ip_addr, self.peer_port, len(self.payload))
 
     @staticmethod
     def from_bytes(raw):

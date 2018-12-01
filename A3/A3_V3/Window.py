@@ -5,11 +5,12 @@ from Packet import *
 from const import *
 
 class Frame:
-    def __init__(self, index, payload = None):
+    def __init__(self, index, payload = None, is_last = False):
         # sequence number
         self.index = index
         # data
         self.payload = payload
+        self.is_last = is_last
         self.send = False
         self.ACK = False
         self.timer = 0
@@ -23,12 +24,15 @@ class Window():
 
     def createSenderWindow(self, message):
         # number of packets
+        print(message)
         self.numberOfPayload = math.ceil(len(message)/PAYLOAD_SIZE) 
-        self.numberOfFrames = self.numberOfPayload + 1
         # init all packets
         for i in range(0, self.numberOfPayload):
-            self.frames[i] = Frame(i+1, message[i * PAYLOAD_SIZE:(i + 1) * PAYLOAD_SIZE])
-        self.frames[-1] = Frame(self.numberOfFrames-1, "###"+self.numberOfPayload+"###")
+            if (i == self.numberOfPayload -1):
+                self.frames[i] = Frame(i+1, message[i * PAYLOAD_SIZE:(i + 1) * PAYLOAD_SIZE], True)
+            else:
+                self.frames[i] = Frame(i+1, message[i * PAYLOAD_SIZE:(i + 1) * PAYLOAD_SIZE])
+            print(self.frames[i].payload)
 
     def createReceiverWindow(self):
         pass
@@ -74,12 +78,12 @@ class Window():
     def finished(self):
         # check payload ###total number###
         # if is last one, update fini
-        p = self.frames[-1]
-        pload = p.payload
-        if ('#' in pload):
-            pload = pload[3,-3]
-            if(self.pointer == pload):
-                self.fini = True
+        if not self.frames:
+            p = self.frames[-1]
+            pload = p.payload
+            if (pload.startswith(IS_FINI)):
+                if(self.pointer == pload.seq_num):
+                    self.fini = True
 
         return self.fini
 

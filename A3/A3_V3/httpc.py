@@ -2,9 +2,8 @@ import socket
 from urllib.parse import urlparse
 import re
 from MockHttpClient import *
-import sys
-print(sys.path)
-from Transport.UdpController import *
+from UdpController import *
+
 class Parameter:
     url = None
     verbose = False
@@ -78,7 +77,6 @@ def sendHttpRequest(command):
 
             else:
                 request = HttpRequest(host, o.path, o.query, Parameter.headers)
-                #print(request.getGet().decode('utf-8'))
                 udpClient.sendMessage(request.getGet())
             #data = recvall(s)
             data = udpClient.receiveMessage()

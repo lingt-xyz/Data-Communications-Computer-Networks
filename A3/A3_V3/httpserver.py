@@ -9,7 +9,7 @@ from pprint import pprint
 #from MockHttpResponse import MockHttpResponse
 
 from FileManager import FileManager
-from Transport.UdpController import *
+from UdpController import *
 
 class MockHttpServer:
 

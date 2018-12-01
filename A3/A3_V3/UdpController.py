@@ -1,6 +1,6 @@
 import logging
 import time
-from socket import *
+import socket
 from Packet import *
 from packetConstructor import *
 from const import *
@@ -14,15 +14,14 @@ class UdpController:
 
     def __init__(self):
         self.__routerAddr = (ROUTER_IP,ROUTER_PORT)
-        self.__packetBuilder = PacketConstructor(SERVER_IP, SERVER_PORT)
+        peer_ip = ipaddress.ip_address(socket.gethostbyname(SERVER_IP))
+        self.__packetBuilder = PacketConstructor(peer_ip, SERVER_PORT)
 
     def connectServer(self):
         """
         Three-way handshake
         """
         logging.info("Connecting to {}:{}.".format(SERVER_IP, SERVER_PORT))
-        self.__routerAddr = (ROUTER_IP,ROUTER_PORT)
-        self.__packetBuilder = PacketConstructor(SERVER_IP, SERVER_PORT)
         self.__conn = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
             # Send SYN
@@ -33,9 +32,10 @@ class UdpController:
             # Expecting SYN_ACK
             response, sender = self.__conn.recvfrom(PACKET_SIZE)
             p = Packet.from_bytes(response)
-            logging.debug('Payload: {}'.format(p.payload.decode("utf-8")))
+            logging.debug("Payload: {}".format(p.payload.decode("utf-8")))
         except socket.timeout:
-            logging.err('No response after {}s'.format(timeout))
+            # TODO
+            logging.err("No response after {}s".format(timeout))
             self.__conn.close()
             return False
         if(p.packet_type == PACKET_TYPE_SYN_AK):
@@ -54,24 +54,27 @@ class UdpController:
         Three-way handshake
         """
         self.__routerAddr = (ROUTER_IP,ROUTER_PORT)
-        self.__conn = socket(AF_INET, SOCK_DGRAM)
+        self.__conn = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.__conn.bind(('', SERVER_PORT))
         logging.info("Server is listening at {}:{}.".format(SERVER_IP, SERVER_PORT))
 
         packet = self.getPacket()
-
+        print(packet)
         # boolean if connection is built
         # if pkt type is syn, send ack syn, if already acked, return true
         if (packet.packet_type == PACKET_TYPE_SYN):
             addr = (packet.peer_ip_addr, packet.peer_port)
-            self.sendPacket(PACKET_TYPE_SYN_AK, 0)
+            packet = self.__packetBuilder.build(PACKET_TYPE_SYN_AK, 0)
+            self.__conn.sendto(packet.to_bytes(), self.__routerAddr)
             # we can just ignore the comming ACK, because it could be lost but the sender would not deal with this case
             # but we do shuld be careful with the first packet when receiving the http request
             return True
         return False        
 
     def sendMessage(self, message):
-	    window = Window(message)
+	    window = Window()
+	    window.createSenderWindow(message)
+
 	    threading.Thread(target=self.senderListener, args=(window)).start()
 	    while window.hasPendingPacket: # Not all packets have been sent
                 # Get next sendable packets if there is any in WINDOW
@@ -104,6 +107,7 @@ class UdpController:
 
     def receiveMessage(self):
 	    window = Window()
+	    window.createReceiverWindow()
 	    while not window.finished():
                 p = self.getPacket()
                 # discard possible packet from handshake
