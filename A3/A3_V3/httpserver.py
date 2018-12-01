@@ -28,6 +28,7 @@ class MockHttpServer:
 		server = UdpController()
 		server.connectClient()
 		data = server.receiveMessage()
+		print(data)
 		logging.debug("Received the data: \r\n{0}".format(data))
 		requestParser = HttpRequestParser(data)
 		logging.debug("Received the {0} request.".format(requestParser.method))
@@ -35,6 +36,7 @@ class MockHttpServer:
 		response_msg = self.generateResponse(requestParser, self.dataDirectory)
 		logging.debug('Response message: {0}.'.format(response_msg))
 		server.sendMessage(response_msg)
+		print(response_msg)
 
 	# deal the file request, generate response bytes string, according to HTTP standards.
 	def generateResponse(self, requestParser, dirPath):

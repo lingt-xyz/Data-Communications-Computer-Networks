@@ -21,6 +21,7 @@ class Window():
         self.pointer = 0
         # data
         self.frames = []
+        self.fini = False
 
     def createSenderWindow(self, message):
         # number of packets
@@ -29,9 +30,9 @@ class Window():
         # init all packets
         for i in range(0, self.numberOfPayload):
             if (i == self.numberOfPayload -1):
-                self.frames[i] = Frame(i+1, message[i * PAYLOAD_SIZE:(i + 1) * PAYLOAD_SIZE], True)
+                self.frames.append(Frame(i, message[i * PAYLOAD_SIZE:], True))
             else:
-                self.frames[i] = Frame(i+1, message[i * PAYLOAD_SIZE:(i + 1) * PAYLOAD_SIZE])
+                self.frames.append(Frame(i, message[i * PAYLOAD_SIZE:(i + 1) * PAYLOAD_SIZE]))
             print(self.frames[i].payload)
 
     def createReceiverWindow(self):
@@ -78,7 +79,8 @@ class Window():
     def finished(self):
         # check payload ###total number###
         # if is last one, update fini
-        if not self.frames:
+        if self.frames:
+            print("frames:{}".format(self.frames))
             p = self.frames[-1]
             pload = p.payload
             if (pload.startswith(IS_FINI)):
@@ -94,7 +96,7 @@ class Window():
             # check whether already received
             if self.frames[index] is None:
                 self.frames[index] = p
-                self.updateWindow(p)
+                self.updateWindow(index)
         else:
             # discard this packet
             pass
