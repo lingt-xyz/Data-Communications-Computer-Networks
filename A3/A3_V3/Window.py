@@ -24,15 +24,15 @@ class Window:
         self.pointer = 0
         # data
         self.frames = []
-        self.numberOfPayload = 0
+        self.numberOfFrames = 0
         self.fini = False
 
     def createSenderWindow(self, message):
         # number of packets
-        self.numberOfPayload = math.ceil(len(message)/PAYLOAD_SIZE) 
+        self.numberOfFrames = math.ceil(len(message)/PAYLOAD_SIZE) 
         # init all packets
-        for i in range(0, self.numberOfPayload):
-            if i == self.numberOfPayload - 1:
+        for i in range(0, self.numberOfFrames):
+            if i == self.numberOfFrames - 1:
                 self.frames.append(Frame(i + 1, message[i * PAYLOAD_SIZE:], True))
             else:
                 self.frames.append(Frame(i + 1, message[i * PAYLOAD_SIZE:(i + 1) * PAYLOAD_SIZE]))
@@ -50,7 +50,6 @@ class Window:
                 break
             f = self.frames[i]
             if not f.send:
-                f.send = True
                 frameList.append(f)
         return frameList
 
@@ -68,15 +67,15 @@ class Window:
             else:
                 break
         self.pointer += offset
+        for i in range(0, self.numberOfFrames):
+            logging.debug("Check WINDOW frames is ACK {}".format(self.frames[i].ACK))
 
     def hasPendingPacket(self):
         """
         Check whether all packets have been ACKed
         """
-        logging.debug("---------------->Number of frames: {}".format(self.numberOfFrames))
         for i in range(0, self.numberOfFrames):
-            logging.debug("---------------->Check frames: {}".format(self.frames[i].ACK))
-
+            logging.debug("Packet sent: is ACK {}".format(self.frames[i].ACK))
         for i in range(0, self.numberOfFrames):
             if not self.frames[i].ACK:
                 return True

@@ -5,6 +5,7 @@ from MockHttpClient import *
 from UdpController import *
 import logging
 import sys
+import argparse
 
 
 class Parameter:
@@ -45,10 +46,6 @@ def sendHttpRequest(command):
         command = command.split(" -o ")[0]
     if ("-v" in command):
         Parameter.verbose = True
-        # whether output debug
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-    #else:
-    #    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     if ("-h" in command):
         Parameter.headers = getHeaders(command)
 
@@ -80,15 +77,17 @@ def sendHttpRequest(command):
                         Parameter.bodyData = f.read()
                 request = HttpRequest(host, o.path, Parameter.bodyData, Parameter.headers)
                 #print(request.getPost().decode('utf-8'))
+                logging.debug("[Application] Client sent request: {}".format(request.getPost()))
                 udpClient.sendMessage(request.getPost())
 
             else:
                 request = HttpRequest(host, o.path, o.query, Parameter.headers)
+                logging.debug("[Application] Client sent request: {}".format(request.getGet()))
                 udpClient.sendMessage(request.getGet())
             data = udpClient.receiveMessage()
+            logging.debug("[Application] Client received response: {}".format(data.encode('utf-8')))
                 
             response = HttpResponse(data)
-            logging.debug("---------------->Client received response: {}".format(response))
             if(response.code == HttpCode.redirect):
                 host = response.location
             else:
@@ -132,10 +131,21 @@ def execute(command):
 
 
 # program entrance
+# parse the input parameters
+parser = argparse.ArgumentParser()
+parser.add_argument("-v", help="output log", action='store_true')
+args = parser.parse_args()
+
+# whether output debug
+if (args.v):
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+else:
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+
 while True:
     command = input("\nplease enter the command; enter 'quit' or 'exit' or 'bye' to quit:\n" + "httpc ")
     if("quit" in command or "exit" in command or "bye" in command):
         break
-    
+
     Parameter.reInit()
     execute(command)

@@ -19,7 +19,7 @@ class UdpController:
         """
         Three-way handshake
         """
-        logging.info("Connecting to {}:{}.".format(SERVER_IP, SERVER_PORT))
+        logging.info("[Transport] Connecting to {}:{}.".format(SERVER_IP, SERVER_PORT))
         self.__routerAddr = (ROUTER_IP, ROUTER_PORT)
         peer_ip = ipaddress.ip_address(socket.gethostbyname(SERVER_IP))
         self.__packetBuilder = PacketConstructor(peer_ip, SERVER_PORT)
@@ -29,13 +29,13 @@ class UdpController:
             p = self.__packetBuilder.build(PACKET_TYPE_SYN)
             self.__conn.sendto(p.to_bytes(), self.__routerAddr)
             self.__conn.settimeout(ALIVE)
-            logging.debug('Waiting for a response')
+            logging.debug('[Transport] Client Waiting for a response from the server.')
             # Expecting SYN_ACK
             response, sender = self.__conn.recvfrom(PACKET_SIZE)
             p = Packet.from_bytes(response)
-            logging.info("Server connection established.")
+            logging.info("[Transport] Server connection established.")
         except socket.timeout:
-            logging.err("No response after {}s".format(ALIVE))
+            logging.err("[Transport] No response after {}s".format(ALIVE))
             self.__conn.close()
             return False
         if p.packet_type == PACKET_TYPE_SYN_AK:
@@ -45,7 +45,7 @@ class UdpController:
             # No need to timeout, we know server is ready
             return True
         else:
-            logging.err("Unexpected packet: {}".format(p.packet_type))
+            logging.err("[Transport] Unexpected packet: {}".format(p))
             self.__conn.close()
             return False
 
@@ -56,7 +56,7 @@ class UdpController:
         # self.__routerAddr = (ROUTER_IP,ROUTER_PORT)
         self.__conn = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.__conn.bind(('', SERVER_PORT))
-        logging.info("Server is listening at {}:{}.".format(SERVER_IP, SERVER_PORT))
+        logging.info("[Transport] Server is listening at {}:{}.".format(SERVER_IP, SERVER_PORT))
 
         packet = self.getPacket()
         # boolean if connection is built
@@ -67,7 +67,7 @@ class UdpController:
             self.__conn.sendto(packet.to_bytes(), self.__routerAddr)
             # we can just ignore the coming ACK, because it could be lost but the sender would not deal with this case
             # but we do should be careful with the first packet when receiving the http request
-            logging.info("Client connection established.")
+            logging.info("[Transport] Client connection established.")
             return True
         return False
 
@@ -76,20 +76,22 @@ class UdpController:
         window.createSenderWindow(message)
 
         threading.Thread(target=self.senderListener, args=(window,)).start()
-        while window.hasPendingPacket:  # Not all packets have been sent
+        while window.hasPendingPacket():  # Not all packets have been sent
             # Get next sendable packets if there is any in WINDOW
             for frame in window.getFrames():
                 p = self.__packetBuilder.build(PACKET_TYPE_DATA, frame.seq_num, frame.payload)
                 self.__conn.sendto(p.to_bytes(), self.__routerAddr)
-                logging.debug("--------------->Send Message: {}".format(p.payload))
+                logging.debug("[Transport] Send Message: {}".format(p.payload))
                 frame.timer = time.time()
+                frame.send = True
 
     def senderListener(self, window):
         """
         Listen response from server
         """
-        while window.hasPendingPacket:
+        while window.hasPendingPacket():
             # Find packets that have been sent but have not been ACKed
+            logging.debug('[Transport] Found pending packets have not been ACKed, check timeout.')
             # Then, check their timer
             for i in range(window.pointer, window.pointer + WINDOW_SIZE):
                 if i >= len(window.frames):
@@ -99,15 +101,16 @@ class UdpController:
                     if f.timer + TIME_OUT < time.time():
                         # reset send status, so it can be re-sent
                         f.send = False
-                        logging.debug("--------------->Time out: {}".format(f.seq_num))
+                        logging.debug("[Transport] Time out: {}: sent at {}, now is {}".format(f.seq_num, f.timer, time.time()))
             # update ACK
             response, sender = self.__conn.recvfrom(PACKET_SIZE)
 
             p = Packet.from_bytes(response)
-            logging.debug('Received response: {}: {}'.format(p, p.payload.decode("utf-8")))
+            logging.debug('[Transport] Received response: {}: {}'.format(p, p.payload.decode("utf-8")))
 
             if p.packet_type == PACKET_TYPE_AK:
                 window.updateWindow(p.seq_num)
+        logging.debug('[Transport] Listener reaches the end!')
 
     def receiveMessage(self):
         window = Window()
@@ -126,25 +129,24 @@ class UdpController:
         data = self.retrieveData(window)
         return data
 
-    # return data
+    # return data (bytes)
     def retrieveData(self, window):
         data = b''
         for f in window.frames:
             data = data + f.payload
-        return data.decode("utf-8")
+        return data
 
     def getPacket(self):
         self.__conn.settimeout(ALIVE)
         try:
             data, addr = self.__conn.recvfrom(PACKET_SIZE)
             pkt = Packet.from_bytes(data)
-            logging.debug("--------------->Received: {}:{}".format(pkt,pkt.payload))
+            logging.debug("[Transport] Received: {}:{}".format(pkt,pkt.payload))
             self.__routerAddr = addr
 
             if self.__packetBuilder is None:
                 self.__packetBuilder = PacketConstructor(pkt.peer_ip_addr, pkt.peer_port)
 
-            logging.debug("Got packet type: {} with #{}".format(str(pkt.packet_type), str(pkt.seq_num)))
             return pkt
         except socket.timeout:
             return None

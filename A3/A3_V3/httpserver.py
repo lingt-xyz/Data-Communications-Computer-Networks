@@ -23,15 +23,15 @@ class MockHttpServer:
 
 	# start the server and dispatch new connection to a thread to handle the communication between client and server
 	def start(self):
-		logging.info("Starting web server...")
+		logging.info("[Application] Starting web server...")
 		server = UdpController()
 		server.connectClient()
-		data = server.receiveMessage()
-		logging.debug("Received the data: \r\n{0}".format(data))
+		data = server.receiveMessage().decode('utf-8')
+		logging.debug("[Application] Received the data: \r\n{0}".format(data))
 		requestParser = HttpRequestParser(data)
-		logging.debug("Received the {0} request.".format(requestParser.method))
+		logging.debug("[Application] Received the {0} request.".format(requestParser.method))
 		response_msg = self.generateResponse(requestParser, self.dataDirectory)
-		logging.debug('Response message: {0}.'.format(response_msg))
+		logging.debug('[Application] Response message: {0}.'.format(response_msg))
 		server.sendMessage(response_msg)
 
 	# deal the file request, generate response bytes string, according to HTTP standards.
