@@ -12,8 +12,3 @@
     8. `post -h Content-Type:application/json -f test.txt http://httpbin.org/post`
     9. `post -h Content-Type: file/txt -f test.txt http://httpbin.org/post -o filewrite.txt`
     9. `post -h Content-Type:application/json -h hk1:hv1 -d '{"Assignment": 1}' http://httpbin.org/post`
-
-
-### Team: 
-* 27781083: Tiantian Ji
-* 40014082: Ling Tan
